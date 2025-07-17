@@ -1,4 +1,4 @@
-import prodEnv from '../config/env.prod';
+// Removed import of env.prod - using environment variables instead
 import admin from 'firebase-admin';
 import { Firestore } from '@google-cloud/firestore';
 
@@ -44,9 +44,7 @@ const setupFirebase = (serviceAccount: any, secondInstance = false) => {
 
 const initFirebase = async () => {
   if (!firebase || !firestore) {
-    if (process.env.NODE_ENV === 'production' && prodEnv.firebase_config) {
-      setupFirebase(prodEnv.firebase_config);
-    } else if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+    if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
       // Use service account key from environment variable
       const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
       setupFirebase(serviceAccount);

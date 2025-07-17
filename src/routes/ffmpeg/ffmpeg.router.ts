@@ -1,6 +1,6 @@
 import koaRouter from 'koa-router'
 import { routeAuth } from '../../middleware/authorize'; import * as ffmpegController from './ffmpeg.controller'
-import { Expose } from class- transformer';
+import { Expose } from 'class-transformer';
 import { IsDefined, IsOptional, IsNumber, IsString } from 'class-validator';
 import { Context } from 'koa';
 import { coreValidation } from '../../util/validation';

@@ -2,8 +2,6 @@ service: vrai-ffmpeg-lambda
 
 plugins:
   - serverless-esbuild
-  - serverless-plugin-warmup-ts-bridge
-  - serverless-plugin-warmup
   - serverless-offline
   - serverless-offline-sns
 
@@ -22,33 +20,13 @@ custom:
     s3_bucket:
       production: "vrai"
       dev: "vrai"
-  warmup:
-    runtime: nodejs20.x
-    enabled: true
-    folderName: "_warmup"
-    name: ${self:service}-${opt:stage, self:provider.stage}-warmer
-    cleanFolder: false
-    memorySize: 256
-    role: arn:aws:iam::498727037516:role/deploy-lambda-role
-    tags:
-      Project: medias-lambda
-      Owner: bar
-    vpc: false
-    events:
-      - schedule: "cron(0/5 * * * ? *)"
-    package:
-      individually: true
-      excludeDevDependencies: false
-      exclude:
-        - ./src/tests/**
-        - ./node_modules/**
-        - ./src/**
-      include:
-        - "_warmup/**"
-        - "./node_modules/ffprobe-static/bin/darwin/arm64/ffprobe"
-    timeout: 60
-    prewarm: true
-    concurrency: 5
+# Warmup disabled for now
+  # warmup:
+  #   default:
+  #     enabled: true
+  #     name: ${self:service}-${opt:stage, self:provider.stage}-warmer
+  #     events:
+  #       - schedule: "cron(0/5 * * * ? *)"
   serverless-offline-sns:
     port: 4002
     debug: false
@@ -61,13 +39,12 @@ provider:
   role: arn:aws:iam::498727037516:role/deploy-lambda-role
   environment:
     node_env: ${self:custom.env_var.node_env.${self:custom.current_stage}}
-    PATH: /opt/bin:${env:PATH}
+    PATH: /opt/bin:/var/task/ffmpeg/bin:${env:PATH}
   apiGateway:
     binaryMediaTypes:
       - '*/*'
     shouldStartNameWithService: true
     minimumCompressionSize: 1024
-    payload: '2.0'
 
 functions:
   app:
@@ -77,8 +54,8 @@ functions:
     memorySize: 1024
     environment:
       sieve_api_key: ${env:sieve_api_key, 'placeholder'}
-      AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID, 'placeholder'}
-      AWS_ACCESS_PW: ${env:AWS_ACCESS_PW, 'placeholder'}
+      aws_access_key_id: ${env:aws_access_key_id, 'placeholder'}
+      aws_access_pw: ${env:aws_access_pw, 'placeholder'}
       s3_bucket_name: ${env:s3_bucket_name, 'vrai'}
       openai_secret: ${env:openai_secret, 'placeholder'}
       FIREBASE_SERVICE_ACCOUNT_KEY: ${env:FIREBASE_SERVICE_ACCOUNT_KEY, 'placeholder'}
@@ -106,6 +83,7 @@ functions:
             parameters:
               headers:
                 Content-Type: true
-    layers:
-      - arn:aws:lambda:us-east-2:498727037516:layer:ffmpeg-layer:5
-      - arn:aws:lambda:us-east-2:498727037516:layer:ffprobe:7
+# Layers temporarily disabled - need to be created in us-east-2 region
+    # layers:
+    #   - arn:aws:lambda:us-east-2:498727037516:layer:ffmpeg-layer:5
+    #   - arn:aws:lambda:us-east-2:498727037516:layer:ffprobe:7

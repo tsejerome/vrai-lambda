@@ -1,0 +1,333 @@
+diff --git a/node_modules/gettyimages-api/lib/downloadsimages.js b/node_modules/gettyimages-api/lib/downloadsimages.js
+index 3ad1911..3cac693 100644
+--- a/node_modules/gettyimages-api/lib/downloadsimages.js
++++ b/node_modules/gettyimages-api/lib/downloadsimages.js
+@@ -11,107 +11,107 @@ const _productId = new WeakMap();
+ const _productType = new WeakMap();
+ 
+ class ImagesDownloads extends GettyApiRequest {
+-    set id(value) {
+-        _id.set(this,value);
+-    }
+-    get id() {
+-        return _id.get(this);
+-    }
++  set id(value) {
++    _id.set(this, value);
++  }
++  get id() {
++    return _id.get(this);
++  }
+ 
+-    set fileType(fileType) {
+-        _fileType.set(this,fileType);
+-    }
++  set fileType(fileType) {
++    _fileType.set(this, fileType);
++  }
+ 
+-    get fileType() {
+-        return _fileType.get(this);
+-    }
++  get fileType() {
++    return _fileType.get(this);
++  }
+ 
+-    set height(height) {
+-        _height.set(this,height);
+-    }
++  set height(height) {
++    _height.set(this, height);
++  }
+ 
+-    get height() {
+-        return _height.get(this);
+-    }
++  get height() {
++    return _height.get(this);
++  }
+ 
+-    set productId(value) {
+-        _productId.set(this,value);
+-    }
++  set productId(value) {
++    _productId.set(this, value);
++  }
+ 
+-    get productId() {
+-        return _productId.get(this);
+-    }
++  get productId() {
++    return _productId.get(this);
++  }
+ 
+-    set productType(value) {
+-        _productType.set(this,value);
+-    }
++  set productType(value) {
++    _productType.set(this, value);
++  }
+ 
+-    get productType() {
+-        return _productType.get(this);
+-    }
++  get productType() {
++    return _productType.get(this);
++  }
+ 
+-    withFileType(fileType) {
+-        this.fileType = fileType ;
+-        return this;
+-    }
++  withFileType(fileType) {
++    this.fileType = fileType;
++    return this;
++  }
++
++  withId(id) {
++    this.id = id;
++    return this;
++  }
++
++  withHeight(height) {
++    this.height = height;
++    return this;
++  }
++
++  withProductId(productId) {
++    this.productId = productId;
++    return this;
++  }
+ 
+-    withId(id) {
+-        this.id = id;
+-        return this;
++  withProductType(productType) {
++    this.productType = productType;
++    return this;
++  }
++
++  execute() {
++    var id = this.id;
++    var credentials = this.credentials;
++    var hostName = this.hostName;
++    var fileType = this.fileType;
++    var height = this.height;
++    var productId = this.productId;
++    var productType = this.productType;
++
++    if (!id) {
++      throw new SdkException("must specify an image id");
+     }
+ 
+-    withHeight(height) {
+-        this.height = height;
+-        return this;
++    var path = "/v3/downloads/images/";
++    path += this.id;
++    var params = { auto_download: true };
++    if (fileType) {
++      params.file_type = fileType;
+     }
+ 
+-    withProductId(productId) {
+-        this.productId = productId;
+-        return this;
++    if (height) {
++      params.height = this.height;
+     }
+ 
+-    withProductType(productType) {
+-        this.productType = productType;
+-        return this;
++    if (productId) {
++      params.product_id = this.productId;
+     }
+ 
+-    execute() {
+-        var id = this.id;
+-        var credentials = this.credentials;
+-        var hostName = this.hostName;
+-        var fileType = this.fileType;
+-        var height = this.height;
+-        var productId = this.productId;
+-        var productType = this.productType;
+-                
+-        if(!id) {
+-            throw new SdkException("must specify an image id");
+-        }
+-        
+-        var path = "/v3/downloads/images/";
+-        path += this.id;
+-        var params = { auto_download: false };
+-        if (fileType) {
+-            params.file_type = fileType;
+-        }
+-        
+-        if (height) {
+-            params.height = this.height;
+-        }
+-
+-        if (productId) {
+-            params.product_id = this.productId;
+-        } 
+-        
+-        if (productType) {
+-            params.product_type = this.productType;
+-        }
+-
+-        path += "?" + qs.stringify(params);
+-
+-        var webHelper = new WebHelper(credentials, hostName);
+-        return webHelper.postQuery(path, null);
++    if (productType) {
++      params.product_type = this.productType;
+     }
++
++    path += "?" + qs.stringify(params);
++
++    var webHelper = new WebHelper(credentials, hostName);
++    return webHelper.postQuery(path, null);
++  }
+ }
+ 
+ module.exports = ImagesDownloads;
+diff --git a/node_modules/gettyimages-api/lib/downloadsvideos.js b/node_modules/gettyimages-api/lib/downloadsvideos.js
+index ca15234..1ce4ce8 100644
+--- a/node_modules/gettyimages-api/lib/downloadsvideos.js
++++ b/node_modules/gettyimages-api/lib/downloadsvideos.js
+@@ -9,67 +9,65 @@ const _size = new WeakMap();
+ const _productId = new WeakMap();
+ 
+ class VideoDownloads extends GettyApiRequest {
+-    
+-    set id(value) {
+-        _id.set(this,value);
+-    }
+-    
+-    get id() {
+-        return _id.get(this);
+-    }
+-
+-    set productId(value) {
+-        _productId.set(this,value);
+-    }
+-    
+-    get productId() {
+-        return _productId.get(this);
+-    }
+-    
+-    set size(value) {
+-        _size.set(this,value);
++  set id(value) {
++    _id.set(this, value);
++  }
++
++  get id() {
++    return _id.get(this);
++  }
++
++  set productId(value) {
++    _productId.set(this, value);
++  }
++
++  get productId() {
++    return _productId.get(this);
++  }
++
++  set size(value) {
++    _size.set(this, value);
++  }
++
++  get size() {
++    return _size.get(this);
++  }
++
++  withId(id) {
++    this.id = id;
++    return this;
++  }
++
++  withProductId(productId) {
++    this.productId = productId;
++    return this;
++  }
++
++  withSize(size) {
++    this.size = size;
++    return this;
++  }
++
++  execute() {
++    if (!this.id) {
++      throw new SdkException("must specify a video id");
+     }
+ 
+-    get size() {
+-        return _size.get(this);
++    var path = "/v3/downloads/videos/";
++    path += this.id;
++    var params = { auto_download: true };
++    if (this.size) {
++      params.size = this.size;
+     }
+-    
+-    withId(id) {
+-        this.id = id;
+-        return this;
+-    }
+-
+-    withProductId(productId) {
+-        this.productId = productId;
+-        return this;
+-    }
+-    
+-    withSize(size) {
+-        this.size = size;
+-        return this;
++    if (this.productId) {
++      params.product_id = this.productId;
+     }
+ 
+-    execute() {
+-        if(!this.id) {
+-            throw new SdkException("must specify a video id");
+-        }
++    path += "?" + qs.stringify(params);
+ 
+-        var path = "/v3/downloads/videos/";
+-        path += this.id;
+-        var params = { auto_download: false };
+-        if (this.size) {
+-            params.size = this.size;
+-        }
+-        if (this.productId) {
+-            params.product_id = this.productId;
+-        }
+-
+-        path += "?" + qs.stringify(params);
+-
+-        var webHelper = new WebHelper(this.credentials, this.hostName);
+-
+-        return webHelper.postQuery(path, null);      
+-    }
++    var webHelper = new WebHelper(this.credentials, this.hostName);
++    return webHelper.postQuery(path, null);
++  }
+ }
+ 
+ module.exports = VideoDownloads;
+diff --git a/node_modules/gettyimages-api/lib/webhelper.js b/node_modules/gettyimages-api/lib/webhelper.js
+index 6c5cb31..2806036 100644
+--- a/node_modules/gettyimages-api/lib/webhelper.js
++++ b/node_modules/gettyimages-api/lib/webhelper.js
+@@ -68,7 +68,8 @@ function WebHelper(credentials, hostName) {
+                 options.headers.Authorization = "Bearer " + response.access_token;
+             }
+         }
+-        
++        console.log('options', JSON.stringify(options))
++        console.log('postData', JSON.stringify(postData))
+         return request(options, postData);
+     };
+ 

@@ -1,0 +1,80 @@
+service: vrai-ffmpeg-lambda
+
+plugins:
+  - serverless-esbuild
+  - serverless-plugin-warmup-ts-bridge
+  - serverless-plugin-warmup
+  - serverless-offline
+  - serverless-offline-sns
+
+custom:
+  esbuild:
+    inject:
+      - env.ts
+    outputFileExtension: .js
+    format: cjs
+    mainFields: ["main", "module"]
+  current_stage: ${opt:stage, 'dev'}
+  env_var:
+    node_env:
+      production: "production"
+      dev: "development"
+    s3_bucket:
+      production: "vrai"
+      dev: "vrai"
+  warmup:
+    runtime: nodejs20.x
+    enabled: true
+    folderName: "_warmup"
+    name: ${self:service}-${opt:stage, self:provider.stage}-warmer
+    cleanFolder: false
+    memorySize: 256
+    role: arn:aws:iam::498727037516:role/deploy-lambda-role
+    tags:
+      Project: medias-lambda
+      Owner: bar
+    vpc: false
+    events:
+      - schedule: "cron(0/5 * * * ? *)"
+    package:
+      individually: true
+      excludeDevDependencies: false
+      exclude:
+        - ./src/tests/**
+        - ./node_modules/**
+        - ./src/**
+      include:
+        - "_warmup/**"
+        - "./node_modules/ffprobe-static/bin/darwin/arm64/ffprobe"
+    timeout: 60
+    prewarm: true
+    concurrency: 5
+  serverless-offline-sns:
+    port: 4002
+    debug: false
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-2
+  stage: ${self:custom.current_stage}
+  role: arn:aws:iam::498727037516:role/deploy-lambda-role
+  environment:
+    node_env: ${self:custom.env_var.node_env.${self:custom.current_stage}}
+    PATH: /opt/bin:${env:PATH}
+
+functions:
+  app:
+    url: true
+    handler: app.server
+    timeout: 900
+    events:
+      - http:
+          path: /
+          method: ANY
+      - http:
+          path: /{proxy+}
+          method: ANY
+    layers:
+      - arn:aws:lambda:us-east-2:498727037516:layer:ffmpeg-layer:5
+      - arn:aws:lambda:us-east-2:498727037516:layer:ffprobe:7

@@ -1,0 +1,3 @@
+
+const MONGODB_USER_COLLECTION = 'users';
+export { MONGODB_USER_COLLECTION } 

@@ -1,0 +1,54 @@
+image: node:16-alpine3.18
+
+stages:
+  - test
+  - deploy
+
+deploy_staging:
+  stage: deploy
+  before_script:
+    - npm config set prefix /usr/local
+    - npm install -g serverless@3.12.0
+    # - npm install -g serverless-plugin-typescript
+    - npm install
+  script:
+    - serverless config credentials --provider aws --key $AWS_ACCESS_KEY_ID --secret $AWS_SECRET_ACCESS_KEY
+    - serverless deploy
+  environment:
+    name: staging
+  only:
+    - staging
+
+deploy_production:
+  stage: deploy
+  before_script:
+    - npm config set prefix /usr/local
+    - npm install -g serverless
+    - npm install -g serverless-plugin-typescript
+    - npm install
+    - npm install --save-dev serverless-plugin-warmup
+    - npm install --save-dev serverless-plugin-warmup-ts-bridge
+    - npm install --save-dev serverless-plugin-include-dependencies
+    - echo "$ENV_PROD_TS" > ./src/config/env.prod.ts
+    - rm -rf ffmpeg/*
+  script:
+    - ls
+    - npx serverless@2.72.4 config credentials --provider aws --key $AWS_ACCESS_KEY_ID --secret $AWS_SECRET_ACCESS_KEY
+    - npx serverless@2.72.4 deploy --stage production
+  environment:
+    name: production
+  only:
+    - production
+    - hotfix
+
+run_tests:
+  stage: test
+  image: node:latest
+  script:
+    # - echo "$ENV_PROD_TS" > ./src/config/env.prod.ts
+    # - npm run build # if you need to compile TypeScript to JavaScript
+    - npm install
+    # - npx jest --detectOpenHandles
+  only:
+    - production
+    - merge_requests

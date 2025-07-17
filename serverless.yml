@@ -76,8 +76,8 @@ functions:
     timeout: 900   memorySize: 1024
     environment:
       sieve_api_key: ${env:sieve_api_key}
-      aws_access_key_id: ${env:aws_access_key_id}
-      aws_access_pw: ${env:aws_access_pw}
+      AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID}
+      AWS_ACCESS_PW: ${env:AWS_ACCESS_PW}
       s3_bucket_name: ${env:s3_bucket_name}
       openai_secret: ${env:openai_secret}
       FIREBASE_SERVICE_ACCOUNT_KEY: ${env:FIREBASE_SERVICE_ACCOUNT_KEY}

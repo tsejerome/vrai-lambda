@@ -66,7 +66,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_ACCESS_PW }}
           aws-region: us-east-2
       
       - name: Deploy to AWS Lambda
@@ -77,6 +77,6 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           s3_bucket_name: ${{ secrets.s3_bucket_name }}
           openai_secret: ${{ secrets.openai_secret }}
-          aws_access_key_id: ${{ secrets.aws_access_key_id }}
-          aws_access_pw: ${{ secrets.aws_access_pw }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_ACCESS_PW: ${{ secrets.AWS_ACCESS_PW }}
           NEXT_PUBLIC_CLIENT_FIREBASE_CONFIG: ${{ secrets.NEXT_PUBLIC_CLIENT_FIREBASE_CONFIG }} 

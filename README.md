@@ -27,8 +27,8 @@ DATABASE_URL=mongodb+srv://username:password@your-cluster.mongodb.net/your-datab
 s3bucket_name=vrai
 
 # AWS Configuration
-aws_access_key_id=your-aws-access-key-id
-aws_access_pw=your-aws-secret-access-key
+AWS_ACCESS_KEY_ID=your-aws-access-key-id
+AWS_ACCESS_PW=your-aws-secret-access-key
 
 # OpenAI Configuration
 openai_secret=sk-your-openai-api-key-here
@@ -53,8 +53,8 @@ DATABASE_URL=mongodb+srv://admin:password@vrai-dev.mongodb.net/vrai-dev?retryWri
 
 s3bucket_name=vrai
 
-aws_access_key_id=AKIAXIHTSVJGL3JQX36
-aws_access_pw=your-aws-secret-access-key
+AWS_ACCESS_KEY_ID=AKIAXIHTSVJGL3JQX36
+AWS_ACCESS_PW=your-aws-secret-access-key
 
 openai_secret=sk-1234567890def
 

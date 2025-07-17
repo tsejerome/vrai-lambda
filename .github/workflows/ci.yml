@@ -12,13 +12,12 @@ on:
       - staging
 
 env:
-  NODE_VERSION: 16
+  NODE_VERSION:16
 jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
-    if: github.event_name == pull_request    
-    steps:
+    if: github.event_name == pull_request    steps:
       - name: Checkout code
         uses: actions/checkout@v4
       
@@ -26,7 +25,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm'
+          cache: npm
       
       - name: Install dependencies
         run: npm ci
@@ -40,7 +39,7 @@ jobs:
     name: Deploy to Staging
     runs-on: ubuntu-latest
     needs: test
-    if: github.ref == 'refs/heads/staging
+    if: github.ref == refs/heads/staging
     environment: staging
     
     steps:
@@ -51,10 +50,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm'
+          cache: npm
       
       - name: Install Serverless Framework
-        run: npm install -g serverless@30.12     
+        run: npm install -g serverless
+      
       - name: Install dependencies
         run: npm ci
       
@@ -72,7 +72,7 @@ jobs:
     name: Deploy to Production
     runs-on: ubuntu-latest
     needs: test
-    if: github.ref == 'refs/heads/production|| github.ref == refs/heads/hotfix
+    if: github.ref == refs/heads/production || github.ref == refs/heads/hotfix
     environment: production
     
     steps:
@@ -83,10 +83,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: npm'
+          cache: npm
       
       - name: Install Serverless Framework
-        run: npm install -g serverless@20.72.4     
+        run: npm install -g serverless
+      
       - name: Install dependencies
         run: npm ci
       
@@ -95,9 +96,6 @@ jobs:
           npm install --save-dev serverless-plugin-warmup
           npm install --save-dev serverless-plugin-warmup-ts-bridge
           npm install --save-dev serverless-plugin-include-dependencies
-      
-      - name: Create production environment file
-        run: echo "$[object Object][object Object] secrets.ENV_PROD_TS }}" > ./src/config/env.prod.ts
       
       - name: Clean ffmpeg directory
         run: rm -rf ffmpeg/*
@@ -110,4 +108,4 @@ jobs:
           aws-region: us-east-2
       
       - name: Deploy to production
-        run: npx serverless@2.72.4--stage production 
+        run: serverless deploy --stage production 

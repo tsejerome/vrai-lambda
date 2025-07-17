@@ -58,7 +58,7 @@ provider:
   runtime: nodejs20.x
   region: us-east-2
   stage: ${self:custom.current_stage}
-  role: arn:aws:iam::49872737516role/deploy-lambda-role
+  role: arn:aws:iam::498727037516:role/deploy-lambda-role
   environment:
     node_env: ${self:custom.env_var.node_env.${self:custom.current_stage}}
     PATH: /opt/bin:${env:PATH}
@@ -66,23 +66,24 @@ provider:
     binaryMediaTypes:
       - '*/*'
     shouldStartNameWithService: true
-    minimumCompressionSize:1024
-    payload: '2.0
+    minimumCompressionSize: 1024
+    payload: '2.0'
 
 functions:
   app:
     url: true
     handler: app.server
-    timeout: 900   memorySize: 1024
+    timeout: 900
+    memorySize: 1024
     environment:
-      sieve_api_key: ${env:sieve_api_key}
-      AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID}
-      AWS_ACCESS_PW: ${env:AWS_ACCESS_PW}
-      s3_bucket_name: ${env:s3_bucket_name}
-      openai_secret: ${env:openai_secret}
-      FIREBASE_SERVICE_ACCOUNT_KEY: ${env:FIREBASE_SERVICE_ACCOUNT_KEY}
-      DATABASE_URL: ${env:DATABASE_URL}
-      NEXT_PUBLIC_CLIENT_FIREBASE_CONFIG: ${env:NEXT_PUBLIC_CLIENT_FIREBASE_CONFIG}
+      sieve_api_key: ${env:sieve_api_key, 'placeholder'}
+      AWS_ACCESS_KEY_ID: ${env:AWS_ACCESS_KEY_ID, 'placeholder'}
+      AWS_ACCESS_PW: ${env:AWS_ACCESS_PW, 'placeholder'}
+      s3_bucket_name: ${env:s3_bucket_name, 'vrai'}
+      openai_secret: ${env:openai_secret, 'placeholder'}
+      FIREBASE_SERVICE_ACCOUNT_KEY: ${env:FIREBASE_SERVICE_ACCOUNT_KEY, 'placeholder'}
+      DATABASE_URL: ${env:DATABASE_URL, 'placeholder'}
+      NEXT_PUBLIC_CLIENT_FIREBASE_CONFIG: ${env:NEXT_PUBLIC_CLIENT_FIREBASE_CONFIG, 'placeholder'}
       NODE_ENV: production
     events:
       - http:

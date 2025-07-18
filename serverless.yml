@@ -1,9 +1,12 @@
 service: vrai-ffmpeg-lambda
+frameworkVersion: '3'
 
 plugins:
   - serverless-esbuild
-  # - serverless-offline
-  # - serverless-offline-sns
+  - serverless-plugin-warmup-ts-bridge
+  - serverless-plugin-warmup
+  - serverless-offline
+  - serverless-offline-sns
 
 custom:
   esbuild:
@@ -20,20 +23,40 @@ custom:
     s3_bucket:
       production: "vrai"
       dev: "vrai"
-# Warmup disabled for now
-  # warmup:
-  #   default:
-  #     enabled: true
-  #     name: ${self:service}-${opt:stage, self:provider.stage}-warmer
-  #     events:
-  #       - schedule: "cron(0/5 * * * ? *)"
+  warmup:
+    runtime: nodejs20.x
+    enabled: true
+    folderName: "_warmup"
+    name: ${self:service}-${opt:stage, self:provider.stage}-warmer
+    cleanFolder: false
+    memorySize: 256
+    role: arn:aws:iam::498727037516:role/deploy-lambda-role
+    tags:
+      Project: vrai-lambda
+      Owner: vrai
+    vpc: false
+    events:
+      - schedule: "cron(0/5 * * * ? *)"
+    package:
+      individually: true
+      excludeDevDependencies: false
+      exclude:
+        - ./src/tests/**
+        - ./node_modules/**
+        - ./src/**
+      include:
+        - "_warmup/**"
+        - "./node_modules/ffprobe-static/bin/darwin/arm64/ffprobe"
+    timeout: 60
+    prewarm: true
+    concurrency: 5
   serverless-offline-sns:
     port: 4002
     debug: false
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs20.x
   region: us-east-2
   stage: ${self:custom.current_stage}
   role: arn:aws:iam::498727037516:role/deploy-lambda-role
@@ -83,7 +106,6 @@ functions:
             parameters:
               headers:
                 Content-Type: true
-# Layers temporarily disabled - need to be created in us-east-2 region
-    # layers:
-    #   - arn:aws:lambda:us-east-2:498727037516:layer:ffmpeg-layer:5
-    #   - arn:aws:lambda:us-east-2:498727037516:layer:ffprobe:7
+    layers:
+      - arn:aws:lambda:us-east-2:498727037516:layer:ffmpeg-layer:5
+      - arn:aws:lambda:us-east-2:498727037516:layer:ffprobe:7

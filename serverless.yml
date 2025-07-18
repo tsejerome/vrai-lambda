@@ -61,7 +61,7 @@ provider:
   runtime: nodejs20.x
   region: us-east-2
   stage: ${self:custom.current_stage}
-  role: arn:aws:iam::498727037516:role/deploy-lambda-role
+  # role: arn:aws:iam::498727037516:role/deploy-lambda-role  # Removed cross-account role
   environment:
     node_env: ${self:custom.env_var.node_env.${self:custom.current_stage}}
     PATH: /opt/bin:/var/task/ffmpeg/bin:${env:PATH}

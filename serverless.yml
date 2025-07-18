@@ -2,8 +2,8 @@ service: vrai-ffmpeg-lambda
 
 plugins:
   - serverless-esbuild
-  - serverless-offline
-  - serverless-offline-sns
+  # - serverless-offline
+  # - serverless-offline-sns
 
 custom:
   esbuild:

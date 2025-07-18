@@ -1,5 +1,4 @@
 service: vrai-ffmpeg-lambda
-frameworkVersion: ^3.0.0
 
 plugins:
   - serverless-esbuild
@@ -34,7 +33,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs20.x
+  runtime: nodejs14.x
   region: us-east-2
   stage: ${self:custom.current_stage}
   role: arn:aws:iam::498727037516:role/deploy-lambda-role

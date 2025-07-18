@@ -74,7 +74,7 @@
     "jest": "^26.6.3",
     "nodemon": "^2.0.4",
     "npm-check-updates": "^4.1.2",
-    "serverless-offline": "13.3.2",
+    "serverless-offline": "8.8.1",
     "serverless-offline-sns": "^0.76.0",
     "serverless-plugin-include-dependencies": "^4.1.0",
     "serverless-plugin-typescript": "2.1.5",

@@ -65,11 +65,12 @@ provider:
   environment:
     node_env: ${self:custom.env_var.node_env.${self:custom.current_stage}}
     PATH: /opt/bin:/var/task/ffmpeg/bin:${env:PATH}
-  apiGateway:
-    binaryMediaTypes:
-      - '*/*'
-    shouldStartNameWithService: true
-    minimumCompressionSize: 1024
+  # Removed API Gateway config since using Lambda URL only:
+  # apiGateway:
+  #   binaryMediaTypes:
+  #     - '*/*'
+  #   shouldStartNameWithService: true
+  #   minimumCompressionSize: 1024
 
 functions:
   app:
@@ -87,27 +88,28 @@ functions:
       DATABASE_URL: ${env:DATABASE_URL, 'placeholder'}
       NEXT_PUBLIC_CLIENT_FIREBASE_CONFIG: ${env:NEXT_PUBLIC_CLIENT_FIREBASE_CONFIG, 'placeholder'}
       NODE_ENV: production
-    events:
-      - http:
-          path: /
-          method: ANY
-          request:
-            schemas:
-              application/json:
-                type: object
-            parameters:
-              headers:
-                Content-Type: true
-      - http:
-          path: /{proxy+}
-          method: ANY
-          request:
-            schemas:
-              application/json:
-                type: object
-            parameters:
-              headers:
-                Content-Type: true
+    # Removed API Gateway events - using Lambda URL only
+    # events:
+    #   - http:
+    #       path: /
+    #       method: ANY
+    #       request:
+    #         schemas:
+    #           application/json:
+    #             type: object
+    #         parameters:
+    #           headers:
+    #             Content-Type: true
+    #   - http:
+    #       path: /{proxy+}
+    #       method: ANY
+    #       request:
+    #         schemas:
+    #           application/json:
+    #             type: object
+    #         parameters:
+    #           headers:
+    #             Content-Type: true
     # Temporarily disabled cross-account layers:
     # layers:
     #   - arn:aws:lambda:us-east-2:498727037516:layer:ffmpeg-layer:5

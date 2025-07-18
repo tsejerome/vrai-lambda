@@ -3,10 +3,11 @@ frameworkVersion: '3'
 
 plugins:
   - serverless-esbuild
-  - serverless-plugin-warmup-ts-bridge
-  - serverless-plugin-warmup
-  - serverless-offline
-  - serverless-offline-sns
+  # Temporarily disabled to identify plugin conflict:
+  # - serverless-plugin-warmup-ts-bridge
+  # - serverless-plugin-warmup
+  # - serverless-offline
+  # - serverless-offline-sns
 
 custom:
   esbuild:
@@ -23,36 +24,37 @@ custom:
     s3_bucket:
       production: "vrai"
       dev: "vrai"
-  warmup:
-    runtime: nodejs20.x
-    enabled: true
-    folderName: "_warmup"
-    name: ${self:service}-${opt:stage, self:provider.stage}-warmer
-    cleanFolder: false
-    memorySize: 256
-    role: arn:aws:iam::498727037516:role/deploy-lambda-role
-    tags:
-      Project: vrai-lambda
-      Owner: vrai
-    vpc: false
-    events:
-      - schedule: "cron(0/5 * * * ? *)"
-    package:
-      individually: true
-      excludeDevDependencies: false
-      exclude:
-        - ./src/tests/**
-        - ./node_modules/**
-        - ./src/**
-      include:
-        - "_warmup/**"
-        - "./node_modules/ffprobe-static/bin/darwin/arm64/ffprobe"
-    timeout: 60
-    prewarm: true
-    concurrency: 5
-  serverless-offline-sns:
-    port: 4002
-    debug: false
+  # Temporarily disabled warmup config:
+  # warmup:
+  #   runtime: nodejs20.x
+  #   enabled: true
+  #   folderName: "_warmup"
+  #   name: ${self:service}-${opt:stage, self:provider.stage}-warmer
+  #   cleanFolder: false
+  #   memorySize: 256
+  #   role: arn:aws:iam::498727037516:role/deploy-lambda-role
+  #   tags:
+  #     Project: vrai-lambda
+  #     Owner: vrai
+  #   vpc: false
+  #   events:
+  #     - schedule: "cron(0/5 * * * ? *)"
+  #   package:
+  #     individually: true
+  #     excludeDevDependencies: false
+  #     exclude:
+  #       - ./src/tests/**
+  #       - ./node_modules/**
+  #       - ./src/**
+  #     include:
+  #       - "_warmup/**"
+  #       - "./node_modules/ffprobe-static/bin/darwin/arm64/ffprobe"
+  #   timeout: 60
+  #   prewarm: true
+  #   concurrency: 5
+  # serverless-offline-sns:
+  #   port: 4002
+  #   debug: false
 
 provider:
   name: aws

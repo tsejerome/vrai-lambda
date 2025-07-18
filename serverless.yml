@@ -1,4 +1,5 @@
 service: vrai-ffmpeg-lambda
+frameworkVersion: ^3.0.0
 
 plugins:
   - serverless-esbuild

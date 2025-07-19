@@ -38,6 +38,11 @@ const setupFirebase = (serviceAccount: any, secondInstance = false) => {
 
 const initFirebase = async () => {
   if (!firebase || !firestore) {
+    console.log('Initializing Firebase');
+    console.log('process.env.FIREBASE_SERVICE_ACCOUNT_KEY');
+    console.log(typeof process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+    console.log(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+    console.log(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string));
     setupFirebase(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string));
   }
 

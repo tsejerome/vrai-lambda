@@ -36,16 +36,74 @@ const setupFirebase = (serviceAccount: any, secondInstance = false) => {
   firebase = app;
 };
 
+const parseServiceAccountKey = (envVar: string): any => {
+  try {
+    // First, try direct JSON parsing
+    console.log('Attempting direct JSON.parse...');
+    return JSON.parse(envVar);
+  } catch (directParseError) {
+    const directError = directParseError as Error;
+    console.log('Direct JSON.parse failed:', directError.message);
+
+    try {
+      // Try Base64 decoding (in case it's base64 encoded)
+      console.log('Attempting Base64 decode + JSON.parse...');
+      const decoded = Buffer.from(envVar, 'base64').toString('utf-8');
+      return JSON.parse(decoded);
+    } catch (base64Error) {
+      const base64Err = base64Error as Error;
+      console.log('Base64 decode failed:', base64Err.message);
+
+      try {
+        // Try to fix common quote issues by adding quotes back
+        console.log('Attempting to fix quote issues...');
+        let fixed = envVar;
+
+        // Replace unquoted keys/values with quoted ones
+        fixed = fixed.replace(/([{,]\s*)(\w+):/g, '$1"$2":'); // Fix unquoted keys
+        fixed = fixed.replace(/:\s*([^",{}\[\]]+)([,}])/g, ':"$1"$2'); // Fix unquoted values
+
+        console.log('Fixed string:', fixed);
+        return JSON.parse(fixed);
+      } catch (fixError) {
+        const fixErr = fixError as Error;
+        console.log('Quote fix failed:', fixErr.message);
+
+        // Log the raw environment variable for debugging
+        console.log('Raw environment variable:');
+        console.log('Length:', envVar.length);
+        console.log('First 100 chars:', envVar.substring(0, 100));
+        console.log('Last 100 chars:', envVar.substring(envVar.length - 100));
+
+        throw new Error(`Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY: ${directError.message}`);
+      }
+    }
+  }
+};
+
 const initFirebase = async () => {
   if (!firebase || !firestore) {
     console.log('Initializing Firebase');
-    console.log('process.env.FIREBASE_SERVICE_ACCOUNT_KEY');
-    console.log(typeof process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-    console.log(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-    console.log(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string));
-    setupFirebase(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string));
-  }
+    console.log('process.env.FIREBASE_SERVICE_ACCOUNT_KEY exists:', !!process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+    console.log('Type:', typeof process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
 
+    try {
+      if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+        console.log('Parsing service account key...');
+        const serviceAccount = parseServiceAccountKey(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+        console.log('Successfully parsed service account');
+        setupFirebase(serviceAccount);
+      } else {
+        // Fallback to local file
+        console.log('Using local service account file...');
+        const serviceAccount = await import('../config/google-services-key.dev.json');
+        setupFirebase(serviceAccount);
+      }
+    } catch (error) {
+      console.error('Error initializing Firebase:', error);
+      throw error;
+    }
+  }
 };
 
 export { firestore, firebase, initFirebase };

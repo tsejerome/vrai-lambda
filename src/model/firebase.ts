@@ -29,7 +29,7 @@ const initFirebase = async () => {
       // Parse the JSON string from environment variable
       console.log('Using FIREBASE_SERVICE_ACCOUNT_KEY from environment');
       console.log(typeof process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-      const serviceAccount = JSON.parse(JSON.stringify(process.env.FIREBASE_SERVICE_ACCOUNT_KEY));
+      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
       setupFirebase(serviceAccount);
     } else {
       await import('../config/google-services-key.dev.json')

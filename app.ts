@@ -20,6 +20,14 @@ import { initFirebase } from './src/model/firebase';
 // No need to import config files since we're using .env files
 
 let api = new koaRouter()
+  .get('/', async (ctx) => {
+    ctx.body = {
+      status: 'ok',
+      service: 'vrai-ffmpeg-lambda',
+      version: '1.0.0',
+      timestamp: new Date().toISOString()
+    };
+  })
   .use('/apis', ffmpegRouter.routes());
 
 let options = {
@@ -53,7 +61,9 @@ app
       if (typeof ctx.throwHttpError === "function") {
         return ctx.throwHttpError(err);
       } else {
-        return ctx.body(err)
+        ctx.status = 500;
+        ctx.body = { status: 500, message: 'Internal Server Error' };
+        return;
       }
     }
   })

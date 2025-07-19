@@ -29,12 +29,12 @@ class ErrorResult {
   }
 
   bodyToString() {
-    return JSON.stringify({
+    return {
       status: this.statusCode,
       code: this.code,
       message: this.message,
       metadata: this.metadata,
-    });
+    };
   }
 }
 
@@ -47,7 +47,7 @@ export class MessageUtil {
 
   static error(status: number = 500, code: string, message: string, data?: any) {
     const result = new ErrorResult(status, code, message, data);
-    console.error(result.bodyToString());
+    console.error(JSON.stringify(result.bodyToString()));
     return result.bodyToString();
   }
 }

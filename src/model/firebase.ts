@@ -4,8 +4,6 @@ import { Firestore } from '@google-cloud/firestore';
 
 let firestore: Firestore;
 let firebase: any;
-let devFirestore: Firestore;
-let devFirebase: any;
 
 const setupFirebase = (serviceAccount: any, secondInstance = false) => {
   const appName = secondInstance ? 'dev' : '[DEFAULT]';
@@ -20,13 +18,9 @@ const setupFirebase = (serviceAccount: any, secondInstance = false) => {
 
   const app = admin.app(appName); // Get the initialized app instance
 
-  if (secondInstance) {
-    devFirestore = app.firestore();
-    devFirebase = app;
-  } else {
-    firestore = app.firestore();
-    firebase = app;
-  }
+
+  firestore = app.firestore();
+  firebase = app;
 };
 
 const initFirebase = async () => {
@@ -34,7 +28,8 @@ const initFirebase = async () => {
     if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
       // Parse the JSON string from environment variable
       console.log('Using FIREBASE_SERVICE_ACCOUNT_KEY from environment');
-      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+      console.log(typeof process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+      const serviceAccount = JSON.parse(JSON.stringify(process.env.FIREBASE_SERVICE_ACCOUNT_KEY));
       setupFirebase(serviceAccount);
     } else {
       await import('../config/google-services-key.dev.json')
@@ -43,19 +38,19 @@ const initFirebase = async () => {
         });
     }
   }
-  if (!devFirebase || !devFirestore) {
-    if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
-      // Parse the JSON string from environment variable for dev instance
-      console.log('Using FIREBASE_SERVICE_ACCOUNT_KEY from environment for dev instance');
-      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-      setupFirebase(serviceAccount, true);
-    } else {
-      await import('../config/google-services-key.dev.json')
-        .then((serviceAccount) => {
-          setupFirebase(serviceAccount, true);
-        });
-    }
-  }
+  // if (!devFirebase || !devFirestore) {
+  //   if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+  //     // Parse the JSON string from environment variable for dev instance
+  //     console.log('Using FIREBASE_SERVICE_ACCOUNT_KEY from environment for dev instance');
+  //     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+  //     setupFirebase(serviceAccount, true);
+  //   } else {
+  //     await import('../config/google-services-key.dev.json')
+  //       .then((serviceAccount) => {
+  //         setupFirebase(serviceAccount, true);
+  //       });
+  //   }
+  // }
 };
 
-export { firestore, firebase, devFirestore, devFirebase, initFirebase };
+export { firestore, firebase, initFirebase };

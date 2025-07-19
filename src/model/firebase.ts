@@ -46,6 +46,7 @@ const initFirebase = async () => {
   if (!firebase || !firestore) {
     if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
       // Use service account key from environment variable
+      console.log('FIREBASE_SERVICE_ACCOUNT_KEY', process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
       const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
       setupFirebase(serviceAccount);
     } else {
@@ -58,6 +59,7 @@ const initFirebase = async () => {
   if (!devFirebase || !devFirestore) {
     if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
       // Use service account key from environment variable for dev instance
+      console.log('FIREBASE_SERVICE_ACCOUNT_KEY', process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
       const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
       setupFirebase(serviceAccount, true);
     } else {

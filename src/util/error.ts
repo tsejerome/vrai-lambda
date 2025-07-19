@@ -1,7 +1,6 @@
 import Koa from 'koa';
 import { MessageUtil } from '../../src/util/message';
 
-import * as Sentry from '@sentry/node';
 
 export function formatError(err: any) {
   const statusCode: number = 500;

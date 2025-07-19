@@ -45,23 +45,6 @@ NEXT_PUBLIC_CLIENT_FIREBASE_CONFIG={apiKey:our-api-key,authDomain":your-project.
 3. Download the JSON file
 4py the entire JSON content and paste it as the value for `FIREBASE_SERVICE_ACCOUNT_KEY`
 
-### Example .env file
-
-```bash
-FIREBASE_SERVICE_ACCOUNT_KEY={"type:service_account",project_id":vrai-dev",private_key_id":"abc123rivate_key":"-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG90AQEFAASCBKgwggSkAgEAAoIBAQCqxZtpct15/i8\n...\n-----END PRIVATE KEY-----\n,lient_email:firebase-adminsdk@vrai-dev.iam.gserviceaccount.com,client_id:123456789,"auth_uri":"https://accounts.google.com/o/oauth2,token_uri":"https://oauth2ogleapis.com/token,auth_provider_x509ert_url":"https://www.googleapis.com/oauth2/v1erts","client_x509ert_url":"https://www.googleapis.com/robot/v1/metadata/x59/firebase-adminsdk%40vrai-dev.iam.gserviceaccount.com,universe_domain:googleapis.com}
-DATABASE_URL=mongodb+srv://admin:password@vrai-dev.mongodb.net/vrai-dev?retryWrites=true&w=majority
-
-s3bucket_name=vrai
-
-AWS_ACCESS_KEY_ID=AKIAXIHTSVJGL3JQX36
-AWS_ACCESS_PW=your-aws-secret-access-key
-
-openai_secret=sk-1234567890def
-
-
-NEXT_PUBLIC_CLIENT_FIREBASE_CONFIG={apiKey:our-api-key,authDomain":vrai-dev.firebaseapp.com","projectId":"vrai-dev",storageBucket":"vrai-dev.appspot.com,messagingSenderId:123456789appId:"your-app-id"}
-```
-
 ## How to use
 
 use `serverless offline` to start a local server

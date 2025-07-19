@@ -1,10 +1,14 @@
 service: vrai-ffmpeg-lambda
 frameworkVersion: '^3.38.0'
 
+# Automatically load environment variables from .env files
+useDotenv: true
+
 plugins:
   - serverless-esbuild
   - serverless-offline
   - serverless-offline-sns
+  - serverless-dotenv-plugin
   # Temporarily disabled warmup plugins:
   # - serverless-plugin-warmup-ts-bridge
   # - serverless-plugin-warmup
@@ -56,8 +60,8 @@ custom:
     port: 4002
     debug: false
   serverless-offline:
-    httpPort: 3000
-    lambdaPort: 3002
+    httpPort: 3002
+    lambdaPort: 3003
     websocketPort: 3001
     noPrependStageInUrl: true
     noAuth: true
@@ -85,41 +89,34 @@ functions:
     timeout: 900
     memorySize: 1024
     environment:
-      sieve_api_key: ${env:sieve_api_key, 'placeholder'}
-      aws_access_key_id: ${env:aws_access_key_id, 'placeholder'}
-      aws_access_pw: ${env:aws_access_pw, 'placeholder'}
-      s3_bucket_name: ${env:s3_bucket_name, 'vrai'}
-      openai_secret: ${env:openai_secret, 'placeholder'}
-      FIREBASE_SERVICE_ACCOUNT_KEY: ${env:FIREBASE_SERVICE_ACCOUNT_KEY, 'placeholder'}
-      DATABASE_URL: ${env:DATABASE_URL, 'placeholder'}
-      NEXT_PUBLIC_CLIENT_FIREBASE_CONFIG: ${env:NEXT_PUBLIC_CLIENT_FIREBASE_CONFIG, 'placeholder'}
-      NODE_ENV: production
+      # Environment variables loaded from .env.local via useDotenv
+      openai_secret: ${env:openai_secret}
+    
     layers:
       - arn:aws:lambda:us-east-2:290839967981:layer:ffprobe:1
       - arn:aws:lambda:us-east-2:290839967981:layer:ffmpeg-layer:1
-
-    # Removed API Gateway events - using Lambda URL only
-    # events:
-    #   - http:
-    #       path: /
-    #       method: ANY
-    #       request:
-    #         schemas:
-    #           application/json:
-    #             type: object
-    #         parameters:
-    #           headers:
-    #             Content-Type: true
-    #   - http:
-    #       path: /{proxy+}
-    #       method: ANY
-    #       request:
-    #         schemas:
-    #           application/json:
-    #             type: object
-    #         parameters:
-    #           headers:
-    #             Content-Type: true
+    # API Gateway events for local development (serverless offline)
+    events:
+      - http:
+          path: /
+          method: ANY
+          request:
+            schemas:
+              application/json:
+                type: object
+            parameters:
+              headers:
+                Content-Type: true
+      - http:
+          path: /{proxy+}
+          method: ANY
+          request:
+            schemas:
+              application/json:
+                type: object
+            parameters:
+              headers:
+                Content-Type: true
     # Temporarily disabled cross-account layers:
     # layers:
     #   - arn:aws:lambda:us-east-2:498727037516:layer:ffmpeg-layer:5

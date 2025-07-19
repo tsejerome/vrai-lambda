@@ -5,7 +5,6 @@
   "main": "dist/app.js",
   "scripts": {
     "dev": "export NODE_ENV=dev && nodemon app.ts",
-    "dev:debug": "export SLS_DEBUG=* && export NODE_ENV=dev && node --inspect=0.0.0.0:9229 ./node_modules/serverless/bin/serverless offline",
     "dev:offline": "export NODE_ENV=dev && serverless offline",
     "dev:offline-debug": "export NODE_ENV=dev && node --inspect=0.0.0.0:9229 ./node_modules/serverless/bin/serverless offline --verbose",
     "ncu": "ncu",
@@ -31,8 +30,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ts-node": "^10.9.2",
-    "nodemon": "^2.0.4",
     "@aws-sdk/client-s3": "^3.637.0",
     "@aws-sdk/lib-storage": "^3.637.0",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
@@ -52,10 +49,12 @@
     "koa-router": "^12.0.1",
     "lodash": "^4.17.21",
     "mongodb": "^3.6.0",
+    "nodemon": "^2.0.4",
     "openai": "^5.10.1",
     "serverless-http": "3.2.0",
     "short-uuid": "^4.2.2",
     "sib-api-v3-sdk": "^8.2.1",
+    "ts-node": "^10.9.2",
     "uuid": "^8.3.0"
   },
   "devDependencies": {
@@ -78,6 +77,7 @@
     "nodemon": "^2.0.4",
     "npm-check-updates": "^4.1.2",
     "serverless": "^3.38.0",
+    "serverless-dotenv-plugin": "^6.0.0",
     "serverless-esbuild": "^1.54.3",
     "serverless-offline": "^13.8.0",
     "serverless-offline-sns": "^0.78.0",

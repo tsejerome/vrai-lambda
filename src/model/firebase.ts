@@ -1,64 +1,46 @@
-// Removed import of env.prod - using environment variables instead
-import admin from 'firebase-admin';
+import admin = require('firebase-admin');
 import { Firestore } from '@google-cloud/firestore';
 
 let firestore: Firestore;
 let firebase: any;
 
-const initFirebase = async () => {
-  try {
-    // Only initialize if not already initialized
-    if (!firebase || !firestore) {
-      if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
-        // Safely parse the Firebase service account key from environment variables
-        console.log('Using FIREBASE_SERVICE_ACCOUNT_KEY from environment');
-        console.log(typeof process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+const setupFirebase = (serviceAccount: any, secondInstance = false) => {
+  console.log
+  const params = {
+    type: serviceAccount.type,
+    projectId: serviceAccount.project_id,
+    privateKeyId: serviceAccount.private_key_id,
+    privateKey: serviceAccount.private_key.replace(/\\n/g, '\n'), // Ensure private keys with escaped newlines are correctly formatted
+    clientEmail: serviceAccount.client_email,
+    clientId: serviceAccount.client_id,
+    authUri: serviceAccount.auth_uri,
+    tokenUri: serviceAccount.token_uri,
+    authProviderX509CertUrl: serviceAccount.auth_provider_x509_cert_url,
+    clientC509CertUrl: serviceAccount.client_x509_cert_url,
+  };
 
-        const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string || '{}');
+  const appName = secondInstance ? 'dev' : '[DEFAULT]';
 
-        // Check if the serviceAccount object is valid before initializing Firebase Admin
-        if (!Object.keys(serviceAccount).length) {
-          throw new Error('Firebase service account key is missing or invalid');
-        }
-
-        // Initialize Firebase Admin only if it's not already initialized
-        if (!admin.apps.length) {
-          console.log('Initializing Firebase Admin');
-          admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount),
-            databaseURL: process.env.firebase_database_url
-          });
-        }
-
-        // Get the default app instance
-        const app = admin.app();
-        firestore = app.firestore();
-        firebase = app;
-
-      } else {
-        // Fallback to local service account file
-        const serviceAccount = await import('../config/google-services-key.dev.json');
-
-        if (!admin.apps.length) {
-          console.log('Initializing Firebase Admin with local service account');
-          admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount as any),
-            databaseURL: process.env.firebase_database_url
-          });
-        }
-
-        const app = admin.app();
-        firestore = app.firestore();
-        firebase = app;
-      }
-    }
-
-  } catch (error) {
-    console.error('Error initializing Firebase Admin:', error);
-    // Handle or throw the error based on your application requirements
-    throw error;
+  // Check if the app already exists
+  if (!admin.apps.some(app => app && app.name === appName)) {
+    admin.initializeApp({
+      credential: admin.credential.cert(params),
+      databaseURL: process.env.firebase_database_url
+    }, secondInstance ? 'dev' : undefined);
   }
+
+  const app = admin.app(appName); // Get the initialized app instance
+
+  firestore = app.firestore();
+  firestore.settings({ ignoreUndefinedProperties: true });
+  firebase = app;
+};
+
+const initFirebase = async () => {
+  if (!firebase || !firestore) {
+    setupFirebase(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY as string));
+  }
+
 };
 
 export { firestore, firebase, initFirebase };
-

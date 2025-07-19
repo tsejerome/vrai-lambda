@@ -47,7 +47,7 @@ const initFirebase = async () => {
     if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
       // Use service account key from environment variable
       console.log('FIREBASE_SERVICE_ACCOUNT_KEY', process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+      const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
       setupFirebase(serviceAccount);
     } else {
       await import('../config/google-services-key.dev.json')
@@ -60,7 +60,7 @@ const initFirebase = async () => {
     if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
       // Use service account key from environment variable for dev instance
       console.log('FIREBASE_SERVICE_ACCOUNT_KEY', process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+      const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
       setupFirebase(serviceAccount, true);
     } else {
       await import('../config/google-services-key.dev.json')

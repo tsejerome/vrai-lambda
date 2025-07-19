@@ -8,9 +8,13 @@ import OpenAI from 'openai';
 
 // production / staging
 const ffprobeStatic = {
-  path: '/opt/bin/ffprobe'
+  path: process.env.IS_OFFLINE
+    ? (process.env.FFPROBE_PATH || path.resolve(process.cwd(), 'ffmpeg', 'bin', 'ffprobe'))
+    : '/opt/bin/ffprobe'
 }
-const ffmpegPath = process.env.IS_OFFLINE ? path.resolve(__dirname, 'ffmpeg') : '/opt/bin/ffmpeg'
+const ffmpegPath = process.env.IS_OFFLINE
+  ? (process.env.FFMPEG_PATH || path.resolve(process.cwd(), 'ffmpeg', 'bin', 'ffmpeg'))
+  : '/opt/bin/ffmpeg'
 
 // don't remove below
 const ffmpegStatic = {

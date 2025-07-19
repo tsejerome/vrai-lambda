@@ -28,6 +28,31 @@ custom:
     s3_bucket:
       production: "vrai"
       dev: "vrai"
+  # API Gateway events only for local development
+  events:
+    dev:
+      - http:
+          path: /
+          method: ANY
+          request:
+            schemas:
+              application/json:
+                type: object
+            parameters:
+              headers:
+                Content-Type: true
+      - http:
+          path: /{proxy+}
+          method: ANY
+          request:
+            schemas:
+              application/json:
+                type: object
+            parameters:
+              headers:
+                Content-Type: true
+    production: []
+    staging: []
   # Temporarily disabled warmup config:
   # warmup:
   #   runtime: nodejs20.x
@@ -95,28 +120,8 @@ functions:
     layers:
       - arn:aws:lambda:us-east-2:290839967981:layer:ffprobe:1
       - arn:aws:lambda:us-east-2:290839967981:layer:ffmpeg-layer:1
-    # API Gateway events for local development (serverless offline)
-    events:
-      - http:
-          path: /
-          method: ANY
-          request:
-            schemas:
-              application/json:
-                type: object
-            parameters:
-              headers:
-                Content-Type: true
-      - http:
-          path: /{proxy+}
-          method: ANY
-          request:
-            schemas:
-              application/json:
-                type: object
-            parameters:
-              headers:
-                Content-Type: true
+    # API Gateway events ONLY for local development (serverless offline)
+    events: ${self:custom.events.${self:custom.current_stage}}
     # Temporarily disabled cross-account layers:
     # layers:
     #   - arn:aws:lambda:us-east-2:498727037516:layer:ffmpeg-layer:5

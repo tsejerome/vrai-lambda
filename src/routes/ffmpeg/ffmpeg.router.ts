@@ -32,7 +32,7 @@ const validateTrimAndTranscribe = async (ctx: Context, next: any) => {
   } catch (err) {
     console.error(err);
     ctx.throwHttpError({
-      status: 50,
+      status: 500,
       message: 'Validation error'
     });
   }

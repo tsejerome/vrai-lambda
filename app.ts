@@ -6,7 +6,6 @@ import cors from 'koa-cors';
 import helmet from 'koa-helmet';
 import error from 'koa-json-error'
 import serverless from 'serverless-http'
-import * as Sentry from '@sentry/node';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -28,15 +27,7 @@ let options = {
   methods: ['GET', 'PUT', 'POST', 'PATCH', 'DELETE']
 };
 const app = new Koa()
-app.on("error", (err, ctx) => {
-  initSentry()
-  Sentry.withScope((scope) => {
-    scope.addEventProcessor((event) => {
-      return Sentry.Handlers.parseRequest(event, ctx.request);
-    });
-    Sentry.captureException(err);
-  });
-});
+
 app
   .use(cors(options))
   .use(bodyParser({
@@ -50,7 +41,6 @@ app
   .use(async (ctx, next) => {
     try {
       // return ctx.body = {}
-      initSentry()
       setupThrowError(ctx);
       await initDB()
       await initFirebase();

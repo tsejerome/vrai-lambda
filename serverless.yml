@@ -88,6 +88,10 @@ functions:
       DATABASE_URL: ${env:DATABASE_URL, 'placeholder'}
       NEXT_PUBLIC_CLIENT_FIREBASE_CONFIG: ${env:NEXT_PUBLIC_CLIENT_FIREBASE_CONFIG, 'placeholder'}
       NODE_ENV: production
+    layers:
+      - arn:aws:lambda:us-east-2:290839967981:layer:ffprobe:1
+      - arn:aws:lambda:us-east-2:290839967981:layer:ffmpeg-layer:1
+
     # Removed API Gateway events - using Lambda URL only
     # events:
     #   - http:

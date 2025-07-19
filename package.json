@@ -4,6 +4,7 @@
   "description": "VoiceRecorder AI Lambda Server - FFmpeg processing service",
   "main": "dist/app.js",
   "scripts": {
+    "dev:debug": "IS_OFFLINE=true nodemon --inspect --watch './**/*.ts' --exec 'node -r ts-node/register' app.ts",
     "dev": "export NODE_ENV=dev && nodemon app.ts",
     "ncu": "ncu",
     "build-pro": "tsc -p tsconfig.production.json",
@@ -28,6 +29,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "ts-node": "^10.9.2",
+    "nodemon": "^2.0.4",
     "@aws-sdk/client-s3": "^3.637.0",
     "@aws-sdk/lib-storage": "^3.637.0",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
@@ -36,6 +39,7 @@
     "bottleneck": "^2.19.5",
     "class-transformer": "^0.3.1",
     "class-validator": "^0.12.2",
+    "dotenv": "^16.0.3",
     "esbuild": "0.20.2",
     "firebase-admin": "^9.0.0",
     "gettyimages-api": "^6.2.3",

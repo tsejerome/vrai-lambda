@@ -4,8 +4,10 @@
   "description": "VoiceRecorder AI Lambda Server - FFmpeg processing service",
   "main": "dist/app.js",
   "scripts": {
-    "dev:debug": "IS_OFFLINE=true nodemon --inspect --watch './**/*.ts' --exec 'node -r ts-node/register' app.ts",
     "dev": "export NODE_ENV=dev && nodemon app.ts",
+    "dev:debug": "export SLS_DEBUG=* && export NODE_ENV=dev && node --inspect=0.0.0.0:9229 ./node_modules/serverless/bin/serverless offline",
+    "dev:offline": "export NODE_ENV=dev && serverless offline",
+    "dev:offline-debug": "export NODE_ENV=dev && node --inspect=0.0.0.0:9229 ./node_modules/serverless/bin/serverless offline --verbose",
     "ncu": "ncu",
     "build-pro": "tsc -p tsconfig.production.json",
     "build": "tsc",

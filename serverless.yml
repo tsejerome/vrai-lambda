@@ -3,11 +3,11 @@ frameworkVersion: '3'
 
 plugins:
   - serverless-esbuild
-  # Temporarily disabled to identify plugin conflict:
+  - serverless-offline
+  - serverless-offline-sns
+  # Temporarily disabled warmup plugins:
   # - serverless-plugin-warmup-ts-bridge
   # - serverless-plugin-warmup
-  # - serverless-offline
-  # - serverless-offline-sns
 
 custom:
   esbuild:
@@ -52,9 +52,15 @@ custom:
   #   timeout: 60
   #   prewarm: true
   #   concurrency: 5
-  # serverless-offline-sns:
-  #   port: 4002
-  #   debug: false
+  serverless-offline-sns:
+    port: 4002
+    debug: false
+  serverless-offline:
+    httpPort: 3000
+    lambdaPort: 3002
+    websocketPort: 3001
+    noPrependStageInUrl: true
+    noAuth: true
 
 provider:
   name: aws

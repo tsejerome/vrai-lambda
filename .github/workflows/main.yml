@@ -10,6 +10,7 @@ on:
 
 env:
   NODE_VERSION: 20
+
 jobs:
   test:
     name: Run Tests
@@ -63,14 +64,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_ACCESS_PW }}
           aws-region: us-east-2
       
+      - name: Create .env file from secret
+        run: echo "${{ secrets.ENV_FILE }}" > .env
+      
       - name: Deploy to AWS Lambda
-        run: serverless deploy --stage production
-        env:
-          sieve_api_key: ${{ secrets.sieve_api_key }}
-          FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          s3_bucket_name: ${{ secrets.s3_bucket_name }}
-          openai_secret: ${{ secrets.openai_secret }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_ACCESS_PW: ${{ secrets.AWS_ACCESS_PW }}
-          NEXT_PUBLIC_CLIENT_FIREBASE_CONFIG: ${{ secrets.NEXT_PUBLIC_CLIENT_FIREBASE_CONFIG }} 
+        run: serverless deploy --stage production 

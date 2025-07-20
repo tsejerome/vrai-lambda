@@ -5,6 +5,7 @@ import path from 'path';
 import shortUUID from 'short-uuid';
 import { TrimAndTranscribeRequestBody } from './ffmpeg.router';
 import OpenAI from 'openai';
+import { createPostWithSummary } from '../../helpers/post';
 
 // production / staging
 const ffprobeStatic = {
@@ -90,13 +91,43 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
         response_format: 'json'
       });
 
+      // Create post with summary based on summarizationType
+      let post = null;
+      let summary = null;
+      
+      if (body.summarizationType && body.summarizationType !== 'none') {
+        try {
+          const userId = ctx.state.user?.auth?.uid || 'default-user';
+          
+          post = await createPostWithSummary({
+            userId: userId,
+            transcriptionResult: transcriptionResult.text,
+            summarizationType: body.summarizationType,
+            domain: 'notion.so'
+          });
+          
+          summary = post.summary;
+        } catch (summaryError) {
+          console.error('Error creating post with summary:', summaryError);
+        }
+      }
+
       ctx.body = {
         success: true,
         transcription: transcriptionResult.text,
         duration: duration,
         fromTime: body.fromTime,
         toTime: body.toTime,
-        fileSize: fs.statSync(outputPath).size
+        fileSize: fs.statSync(outputPath).size,
+        ...(post && { 
+          post: {
+            id: post.id,
+            title: post.title,
+            summarizedContent: post.summarizedContent,
+            finalContent: post.finalContent
+          }
+        }),
+        ...(summary && { summary })
       };
 
     } finally {

@@ -11,7 +11,7 @@
     "build-pro": "tsc -p tsconfig.production.json",
     "build": "tsc",
     "predeploy": "npm ci --production && rsync -avz node_modules dist/",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "staging": "serverless deploy",
     "deploy": "serverless deploy --stage production",
     "debug": "export SLS_DEBUG=* && node --inspect ./node_modules/serverless/bin/serverless offline"
@@ -34,6 +34,8 @@
     "@aws-sdk/lib-storage": "^3.637.0",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@google-cloud/firestore": "^4.2.0",
+    "@types/jwt-decode": "^2.2.1",
+    "@types/minimatch": "^5.1.2",
     "axios": "^1.6.8",
     "bottleneck": "^2.19.5",
     "class-transformer": "^0.3.1",

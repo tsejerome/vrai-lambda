@@ -94,18 +94,18 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
       // Create post with summary based on summarizationType
       let post = null;
       let summary = null;
-      
+
       if (body.summarizationType && body.summarizationType !== 'none') {
         try {
           const userId = ctx.state.user?.auth?.uid || 'default-user';
-          
+
           post = await createPostWithSummary({
             userId: userId,
             transcriptionResult: transcriptionResult.text,
             summarizationType: body.summarizationType,
-            domain: 'notion.so'
+            domain: body.summarizationType === 'summarize' ? 'whatsapp.com' : 'notion.so'
           });
-          
+
           summary = post.summary;
         } catch (summaryError) {
           console.error('Error creating post with summary:', summaryError);
@@ -119,7 +119,7 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
         fromTime: body.fromTime,
         toTime: body.toTime,
         fileSize: fs.statSync(outputPath).size,
-        ...(post && { 
+        ...(post && {
           post: {
             id: post.id,
             title: post.title,

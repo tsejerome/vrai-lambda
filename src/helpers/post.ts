@@ -17,7 +17,7 @@ export const createPostWithSummary = async (args: CreatePostArgs) => {
       userId: args.userId,
       promptId: args.summarizationType,
       recordedContent: args.transcriptionResult,
-      domain: args.domain
+      domain: args.summarizationType === 'summarizev2' ? 'whatsapp.com' : args.domain
     });
 
     const title = await PromptHelper.getSummary({
@@ -42,7 +42,7 @@ export const createPostWithSummary = async (args: CreatePostArgs) => {
     };
 
     const result = await mongodb!.collection('posts').insertOne(postData);
-    
+
     return {
       ...postData,
       id: result.insertedId,

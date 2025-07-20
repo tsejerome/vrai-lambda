@@ -10,6 +10,10 @@ export class TrimAndTranscribeRequestBody {
   @Expose()
   @IsString()
   fileBlob: string; // Base64encoded audio file (supports MP3, M4A, WAV, etc.)
+  @IsDefined()
+  @Expose()
+  @IsString()
+  summarizationType: string; //"summarize" or "simple-cleanup"
 
   @IsDefined()
   @Expose()

@@ -24,11 +24,6 @@ export class TrimAndTranscribeRequestBody {
   @Expose()
   @IsNumber()
   toTime: number; // End time in seconds
-
-  @IsOptional()
-  @Expose()
-  @IsString()
-  userId?: string; // Optional user ID for post creation
 }
 
 const validateTrimAndTranscribe = async (ctx: Context, next: any) => {

@@ -8,13 +8,12 @@
 ```bash
 curl -X POST https://your-lambda-url.amazonaws.com/ffmpeg/trim-and-transcribe \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer your-auth-token" \
+  -H "Authorization: Bearer your-firebase-jwt-token" \
   -d '{
     "fileBlob": "UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=",
     "summarizationType": "simple-cleanup",
     "fromTime": 0,
-    "toTime": 30,
-    "userId": "user-123"
+    "toTime": 30
   }'
 ```
 
@@ -43,13 +42,12 @@ curl -X POST https://your-lambda-url.amazonaws.com/ffmpeg/trim-and-transcribe \
 ```bash
 curl -X POST https://your-lambda-url.amazonaws.com/ffmpeg/trim-and-transcribe \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer your-auth-token" \
+  -H "Authorization: Bearer your-firebase-jwt-token" \
   -d '{
     "fileBlob": "UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=",
     "summarizationType": "title",
     "fromTime": 5,
-    "toTime": 25,
-    "userId": "user-456"
+    "toTime": 25
   }'
 ```
 
@@ -58,13 +56,12 @@ curl -X POST https://your-lambda-url.amazonaws.com/ffmpeg/trim-and-transcribe \
 ```bash
 curl -X POST https://your-lambda-url.amazonaws.com/ffmpeg/trim-and-transcribe \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer your-auth-token" \
+  -H "Authorization: Bearer your-firebase-jwt-token" \
   -d '{
     "fileBlob": "UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=",
     "summarizationType": "whatsapp-cleanup",
     "fromTime": 0,
-    "toTime": 60,
-    "userId": "user-789"
+    "toTime": 60
   }'
 ```
 
@@ -73,7 +70,7 @@ curl -X POST https://your-lambda-url.amazonaws.com/ffmpeg/trim-and-transcribe \
 ```bash
 curl -X POST https://your-lambda-url.amazonaws.com/ffmpeg/trim-and-transcribe \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer your-auth-token" \
+  -H "Authorization: Bearer your-firebase-jwt-token" \
   -d '{
     "fileBlob": "UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=",
     "summarizationType": "none",
@@ -127,9 +124,9 @@ curl -X POST https://your-lambda-url.amazonaws.com/ffmpeg/trim-and-transcribe \
 ## Notes
 
 - Replace `https://your-lambda-url.amazonaws.com` with the actual deployed Lambda URL
-- Replace `your-auth-token` with a valid JWT token
+- Replace `your-firebase-jwt-token` with a valid Firebase JWT token
 - The `fileBlob` should be a base64-encoded audio file (MP3, M4A, WAV, etc.)
-- The `userId` parameter is optional - if not provided, defaults to "default-user"
+- The `userId` is automatically extracted from the JWT token - no need to provide it in the request body
 - Supported `summarizationType` values: "simple-cleanup", "title", "whatsapp-cleanup", "none"
 - When `summarizationType` is "none", no post creation or summarization occurs
 - The response includes both the original transcription and the new post data when summarization is enabled

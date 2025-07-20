@@ -97,7 +97,7 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
       
       if (body.summarizationType && body.summarizationType !== 'none') {
         try {
-          const userId = body.userId || 'default-user';
+          const userId = ctx.state.user?.auth?.uid || 'default-user';
           
           post = await createPostWithSummary({
             userId: userId,

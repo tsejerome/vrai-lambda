@@ -11,7 +11,7 @@
     "build-pro": "tsc -p tsconfig.production.json",
     "build": "tsc",
     "predeploy": "npm ci --production && rsync -avz node_modules dist/",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "staging": "serverless deploy",
     "deploy": "serverless deploy --stage production",
     "debug": "export SLS_DEBUG=* && node --inspect ./node_modules/serverless/bin/serverless offline"

@@ -5,7 +5,7 @@ const cacheS3Url = (url: string) => {
   const pattern = /https:\/\/vrai\.s3.*?\.amazonaws\.com\//;
 
   // Replace the matched portion of the URL withhttps://d1ynou9d34.cloudfront.net/"
-  let replacedUrl = url.replace(pattern, https://d1ynou9d34h7uz.cloudfront.net/');
+  let replacedUrl = url.replace(pattern, 'https://d1ynou9d34h7uz.cloudfront.net/');
 
   return replacedUrl;
 
@@ -39,9 +39,9 @@ const getFilePathFromurl = (urlString: string, withoutExtension: boolean) => {
 
 
 const isVraiS3File = (url: string) => url.includes('vrai.s3') ||
-  url.includes(https://vrai.s3') ||
+  url.includes('https://vrai.s3') ||
     url.includes('https://d1ynou9d34h7uz.cloudfront.net/') ||
-    url.includes(https://d16gd.cloudfront.net/');
+    url.includes('https://d16gd.cloudfront.net/');
 
 const isUserUploadedVideo = (url: string) => url.includes('user-upload');
 

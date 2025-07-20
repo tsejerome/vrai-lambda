@@ -1,5 +1,5 @@
 import { Context } from 'vm';
-import { validateMediaFileTypeByNameReqBody } from '../routes/ffmpeg/ffmpeg.router';
+// import { validateMediaFileTypeByNameReqBody } from '../routes/ffmpeg/ffmpeg.router';
 import { firestore, firebase } from '../model/firebase';
 import { exec, ExecException } from 'child_process';
 import jwt_decode from 'jwt-decode';
@@ -15,7 +15,7 @@ const logVideoValidationToFirebase = async (fileInfo: {
   error: any;
 }, file_valid: boolean, ctx: Context) => {
   try {
-    const body = ctx.request.body as validateMediaFileTypeByNameReqBody;
+    const body = ctx.request.body as any;
     const authHeader = ctx.headers['authorization'];
     const bearerToken = authHeader ? authHeader.split(' ')[1] : null;
     let decodedToken: any = null;

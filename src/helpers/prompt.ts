@@ -31,12 +31,11 @@ const PromptHelper: IPromptHelper = {
   getPromptTemplate: async function (promptId: string): Promise<PromptTemplate | null> {
     try {
       await initDB();
-      await ensureTemplatesInitialized();
-      
+
       const template = await mongodb!.collection('promptTemplates').findOne({
         templateId: promptId
       });
-      
+
       return template as PromptTemplate | null;
     } catch (error) {
       console.error('Error fetching prompt template:', error);
@@ -47,16 +46,16 @@ const PromptHelper: IPromptHelper = {
   getSummary: async function ({ promptId, userId, recordedContent, domain }) {
     try {
       const templateDoc = await this.getPromptTemplate(promptId);
-      
+
       const fallbackTemplate = templateDoc || await this.getPromptTemplate('simple-cleanup');
-      
+
       if (!fallbackTemplate) {
         throw new Error(`Template not found: ${promptId} and fallback failed`);
       }
-      
+
       const template = fallbackTemplate.template;
       const msgContent = this.formatPromptMessage(template, recordedContent.trim(), domain);
-      
+
       const input: OpenAI.Chat.ChatCompletionCreateParamsNonStreaming = {
         'model': 'gpt-4o',
         'messages': [
@@ -88,7 +87,7 @@ const PromptHelper: IPromptHelper = {
 
   createPrompt: async function ({ userId, recordedContent, input, output, template }) {
     await initDB();
-    
+
     const promptData = {
       userId,
       input: JSON.stringify(input),

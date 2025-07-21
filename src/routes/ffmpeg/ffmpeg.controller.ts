@@ -6,6 +6,7 @@ import shortUUID from 'short-uuid';
 import { TrimAndTranscribeRequestBody } from './ffmpeg.router';
 import OpenAI from 'openai';
 import { createPostWithSummary } from '../../helpers/post';
+import { uploadFileForDebugging } from '../../util/s3';
 
 // production / staging
 const ffprobeStatic = {
@@ -27,17 +28,22 @@ const openai = new OpenAI({
 });
 
 const trimAndTranscribe = async (ctx: Context, next: Next) => {
+  let inputPath: string | null = null;
+  let outputPath: string | null = null;
+  let fileBuffer: Buffer | null = null;
+  let debugFileUrls: string[] = [];
+
   try {
     const body = ctx.request.body as TrimAndTranscribeRequestBody;
 
     // Decode base64 file blob
-    const fileBuffer = Buffer.from(body.fileBlob, 'base64') as Buffer;
+    fileBuffer = Buffer.from(body.fileBlob, 'base64') as Buffer;
 
     // Create temporary file paths with unique names to avoid conflicts in Lambda
     const timestamp = Date.now();
     const uniqueId = shortUUID.generate();
-    const inputPath = path.join('/tmp', `input-${timestamp}-${uniqueId}.audio`);
-    const outputPath = path.join('/tmp', `trimmed-${timestamp}-${uniqueId}.mp3`);
+    inputPath = path.join('/tmp', `input-${timestamp}-${uniqueId}.audio`);
+    outputPath = path.join('/tmp', `trimmed-${timestamp}-${uniqueId}.mp3`);
 
     try {
       // Write the input file
@@ -146,7 +152,65 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
 
   } catch (err) {
     console.error('Error in trimAndTranscribe:', err);
-    ctx.throw(500, err instanceof Error ? err.message : 'Failed to trim and transcribe audio');
+
+    // Upload files to S3 for debugging
+    try {
+      const userId = ctx.state.user?.auth?.uid || 'anonymous';
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const errorType = err instanceof Error ? err.constructor.name : 'UnknownError';
+
+      // Upload original input file if available
+      if (fileBuffer) {
+        const inputFileName = `debug-input-${timestamp}-${errorType}.audio`;
+        const inputFileUrl = await uploadFileForDebugging(
+          fileBuffer,
+          inputFileName,
+          userId,
+          'audio/mpeg'
+        );
+        debugFileUrls.push(inputFileUrl);
+      }
+
+      // Upload output file if it exists and has content
+      if (outputPath && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 0) {
+        const outputFileBuffer = fs.readFileSync(outputPath);
+        const outputFileName = `debug-output-${timestamp}-${errorType}.mp3`;
+        const outputFileUrl = await uploadFileForDebugging(
+          outputFileBuffer,
+          outputFileName,
+          userId,
+          'audio/mpeg'
+        );
+        debugFileUrls.push(outputFileUrl);
+      }
+
+      // Log debug information
+      console.log('Debug files uploaded:', debugFileUrls);
+      console.log('Error details:', {
+        error: err instanceof Error ? err.message : String(err),
+        errorType,
+        userId,
+        timestamp,
+        debugFileUrls
+      });
+
+    } catch (uploadError) {
+      console.error('Failed to upload debug files:', uploadError);
+    }
+
+    // Include debug file URLs in error response if available
+    const errorMessage = err instanceof Error ? err.message : 'Failed to trim and transcribe audio';
+    const errorResponse: any = {
+      status: 500,
+      message: errorMessage
+    };
+
+    if (debugFileUrls.length > 0) {
+      errorResponse.debugFiles = debugFileUrls;
+      errorResponse.debugNote = 'Files have been uploaded to S3 for debugging purposes';
+    }
+
+    ctx.throw(500, errorResponse);
   }
 
   await next();

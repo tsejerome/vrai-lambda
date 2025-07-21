@@ -1,3 +1,4 @@
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
 
 const cacheS3Url = (url: string) => {
@@ -40,9 +41,59 @@ const getFilePathFromurl = (urlString: string, withoutExtension: boolean) => {
 
 const isVraiS3File = (url: string) => url.includes('vrai.s3') ||
   url.includes('https://vrai.s3') ||
-    url.includes('https://d1ynou9d34h7uz.cloudfront.net/') ||
-    url.includes('https://d16gd.cloudfront.net/');
+  url.includes('https://d1ynou9d34h7uz.cloudfront.net/') ||
+  url.includes('https://d16gd.cloudfront.net/');
 
 const isUserUploadedVideo = (url: string) => url.includes('user-upload');
 
-export { cacheS3Url, uncacheS3Url, getFilePathFromurl, isVraiS3File, isUserUploadedVideo }
+// S3 Client configuration
+const s3Client = new S3Client({
+  region: 'us-east-2',
+  credentials: {
+    accessKeyId: process.env.aws_access_key_id || '',
+    secretAccessKey: process.env.aws_access_pw || ''
+  }
+});
+
+// Upload file to S3 for debugging purposes
+const uploadFileForDebugging = async (
+  fileBuffer: Buffer,
+  fileName: string,
+  userId: string = 'debug',
+  contentType: string = 'audio/mpeg'
+): Promise<string> => {
+  try {
+    const bucketName = 'vrai';
+    const key = `debug/${userId}/${fileName}`;
+
+    const command = new PutObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+      Body: fileBuffer,
+      ContentType: contentType,
+      Metadata: {
+        'debug-timestamp': new Date().toISOString(),
+        'debug-purpose': 'error-investigation'
+      }
+    });
+
+    await s3Client.send(command);
+
+    const fileUrl = `https://${bucketName}.s3.us-east-2.amazonaws.com/${key}`;
+    console.log(`Debug file uploaded successfully: ${fileUrl}`);
+
+    return fileUrl;
+  } catch (error) {
+    console.error('Failed to upload debug file to S3:', error);
+    throw error;
+  }
+};
+
+export {
+  cacheS3Url,
+  uncacheS3Url,
+  getFilePathFromurl,
+  isVraiS3File,
+  isUserUploadedVideo,
+  uploadFileForDebugging
+}

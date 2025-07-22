@@ -1,5 +1,5 @@
 import { Context, Next } from 'koa'
-import { ExecException, execFile, ExecFileException, execSync } from 'child_process';
+import { ExecException, execFile, ExecFileException, execFileSync, execSync } from 'child_process';
 import fs from 'fs'
 import path from 'path';
 import shortUUID from 'short-uuid';
@@ -90,13 +90,25 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
     try {
       // Write the input file
       fs.writeFileSync(inputPath, fileBuffer as Uint8Array);
-      // Debug: Confirm file written
       console.log('Wrote input file:', inputPath);
       const stat = fs.statSync(inputPath);
       console.log('Input file size:', stat.size);
       // Log first 32 bytes of file
       const fileFirstBytes = fs.readFileSync(inputPath).slice(0, 32);
       console.log('Input file first 32 bytes:', fileFirstBytes.toString('hex'));
+
+      try {
+        const ffprobeOutput = execFileSync(ffprobeStatic.path, [
+          '-v', 'error',
+          '-show_format',
+          '-of', 'json',
+          inputPath
+        ], { encoding: 'utf8' });
+        const probeJson = JSON.parse(ffprobeOutput);
+        console.log('ffprobe format_name:', probeJson.format?.format_name);
+      } catch (probeErr) {
+        console.error('ffprobe failed:', probeErr);
+      }
 
       // Verify FFmpeg binary exists
       await new Promise((resolve, reject) => {

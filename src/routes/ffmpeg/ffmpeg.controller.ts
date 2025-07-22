@@ -36,8 +36,19 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
   try {
     const body = ctx.request.body as TrimAndTranscribeRequestBody;
 
-    // Decode base64 file blob
-    fileBuffer = Buffer.from(body.fileBlob, 'base64') as Buffer;
+    // Handle binary CAF file directly (more efficient than base64)
+    let fileBuffer: Buffer;
+
+    if (typeof body.fileBlob === 'string') {
+      // If it's still base64 encoded (backward compatibility)
+      fileBuffer = Buffer.from(body.fileBlob, 'base64');
+    } else if (Buffer.isBuffer(body.fileBlob)) {
+      // If it's already a Buffer (binary file)
+      fileBuffer = body.fileBlob;
+    } else {
+      // If it's an array or other format, convert to Buffer
+      fileBuffer = Buffer.from(body.fileBlob as any);
+    }
 
     // Create temporary file paths with unique names to avoid conflicts in Lambda
     const timestamp = Date.now();

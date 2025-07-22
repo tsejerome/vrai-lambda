@@ -9,7 +9,8 @@ export class TrimAndTranscribeRequestBody {
   @IsDefined()
   @Expose()
   @IsString()
-  fileBlob: string; // Base64encoded audio file (supports MP3, M4A, WAV, etc.)
+  fileBlob: string; // Audio file (base64 string or binary buffer) - supports MP3, M4A, WAV, CAF, etc.
+
   @IsDefined()
   @Expose()
   @IsString()

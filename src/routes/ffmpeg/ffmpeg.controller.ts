@@ -35,18 +35,50 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
 
   try {
     const body = ctx.request.body as TrimAndTranscribeRequestBody;
+    const fileBlob: any = body.fileBlob;
+
+    // Helper type guard for array
+    function isArray(val: unknown): val is any[] {
+      return Array.isArray(val);
+    }
+
+    // Debug: Log fileBlob type and length
+    console.log('fileBlob typeof:', typeof fileBlob);
+    if (typeof fileBlob === 'string') {
+      console.log('fileBlob (string) length:', fileBlob.length);
+      // Log first 100 chars for inspection
+      console.log('fileBlob (string) first 100 chars:', fileBlob.slice(0, 100));
+    } else if (Buffer.isBuffer(fileBlob)) {
+      console.log('fileBlob (Buffer) length:', fileBlob.length);
+      // Log first 32 bytes as hex
+      console.log('fileBlob (Buffer) first 32 bytes:', fileBlob.slice(0, 32).toString('hex'));
+    } else if (isArray(fileBlob)) {
+      console.log('fileBlob (Array) length:', fileBlob.length);
+      // Log first 10 elements
+      if (fileBlob.length > 0) {
+        console.log('fileBlob (Array) first 10 elements:', fileBlob.slice(0, 10));
+      } else {
+        console.log('fileBlob (Array) is empty');
+      }
+    } else {
+      console.log('fileBlob (Unknown type):', fileBlob);
+    }
 
     // Handle binary CAF file directly (more efficient than base64)
-    if (typeof body.fileBlob === 'string') {
+    if (typeof fileBlob === 'string') {
       // If it's still base64 encoded (backward compatibility)
-      fileBuffer = Buffer.from(body.fileBlob, 'base64');
-    } else if (Buffer.isBuffer(body.fileBlob)) {
+      fileBuffer = Buffer.from(fileBlob, 'base64');
+    } else if (Buffer.isBuffer(fileBlob)) {
       // If it's already a Buffer (binary file)
-      fileBuffer = body.fileBlob;
+      fileBuffer = fileBlob;
     } else {
       // If it's an array or other format, convert to Buffer
-      fileBuffer = Buffer.from(body.fileBlob as any);
+      fileBuffer = Buffer.from(fileBlob as any);
     }
+
+    // Debug: Log fileBuffer length and first bytes
+    console.log('fileBuffer length:', fileBuffer.length);
+    console.log('fileBuffer first 32 bytes:', fileBuffer.slice(0, 32).toString('hex'));
 
     // Create temporary file paths with unique names to avoid conflicts in Lambda
     const timestamp = Date.now();
@@ -58,6 +90,13 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
     try {
       // Write the input file
       fs.writeFileSync(inputPath, fileBuffer as Uint8Array);
+      // Debug: Confirm file written
+      console.log('Wrote input file:', inputPath);
+      const stat = fs.statSync(inputPath);
+      console.log('Input file size:', stat.size);
+      // Log first 32 bytes of file
+      const fileFirstBytes = fs.readFileSync(inputPath).slice(0, 32);
+      console.log('Input file first 32 bytes:', fileFirstBytes.toString('hex'));
 
       // Verify FFmpeg binary exists
       await new Promise((resolve, reject) => {

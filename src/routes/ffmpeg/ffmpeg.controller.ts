@@ -42,7 +42,8 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
     // Create temporary file paths with unique names to avoid conflicts in Lambda
     const timestamp = Date.now();
     const uniqueId = shortUUID.generate();
-    inputPath = path.join('/tmp', `input-${timestamp}-${uniqueId}.audio`);
+    // Use .caf extension for proper CAF format detection
+    inputPath = path.join('/tmp', `input-${timestamp}-${uniqueId}.caf`);
     outputPath = path.join('/tmp', `trimmed-${timestamp}-${uniqueId}.mp3`);
 
     try {
@@ -65,8 +66,9 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
         '-t', duration.toString(),
         '-c:a', 'mp3',  // Convert to MP3 codec
         '-b:a', '128k', // Set bitrate for good quality
-        '-ar', '0', // Set sample rate (OpenAI Whisper works well with 16Hz)
+        '-ar', '16000', // Set sample rate to 16kHz (optimal for Whisper)
         '-ac', '1',     // Convert to mono (better for transcription)
+        '-f', 'mp3',    // Force MP3 format
         '-y',           // Overwrite output file if exists
         outputPath
       ];
@@ -161,12 +163,12 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
 
       // Upload original input file if available
       if (fileBuffer) {
-        const inputFileName = `debug-input-${timestamp}-${errorType}.audio`;
+        const inputFileName = `debug-input-${timestamp}-${errorType}.caf`;
         const inputFileUrl = await uploadFileForDebugging(
           fileBuffer,
           inputFileName,
           userId,
-          'audio/mpeg'
+          'audio/x-caf'
         );
         debugFileUrls.push(inputFileUrl);
       }

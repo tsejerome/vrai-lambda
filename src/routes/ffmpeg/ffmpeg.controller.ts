@@ -37,8 +37,6 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
     const body = ctx.request.body as TrimAndTranscribeRequestBody;
 
     // Handle binary CAF file directly (more efficient than base64)
-    let fileBuffer: Buffer;
-
     if (typeof body.fileBlob === 'string') {
       // If it's still base64 encoded (backward compatibility)
       fileBuffer = Buffer.from(body.fileBlob, 'base64');

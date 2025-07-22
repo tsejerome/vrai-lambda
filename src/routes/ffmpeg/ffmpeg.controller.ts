@@ -180,6 +180,30 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
           'audio/x-caf'
         );
         debugFileUrls.push(inputFileUrl);
+      } else if ((ctx.request.body as any)?.fileBlob) {
+        // If fileBuffer is not available, decode the original fileBlob
+        const body = ctx.request.body as TrimAndTranscribeRequestBody;
+        let decodedBuffer: Buffer;
+
+        if (typeof body.fileBlob === 'string') {
+          // Decode base64 to binary
+          decodedBuffer = Buffer.from(body.fileBlob, 'base64');
+        } else if (Buffer.isBuffer(body.fileBlob)) {
+          // Already binary
+          decodedBuffer = body.fileBlob;
+        } else {
+          // Convert to buffer
+          decodedBuffer = Buffer.from(body.fileBlob as any);
+        }
+
+        const inputFileName = `debug-input-${timestamp}-${errorType}.caf`;
+        const inputFileUrl = await uploadFileForDebugging(
+          decodedBuffer,
+          inputFileName,
+          userId,
+          'audio/x-caf'
+        );
+        debugFileUrls.push(inputFileUrl);
       }
 
       // Upload output file if it exists and has content
@@ -202,7 +226,9 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
         errorType,
         userId,
         timestamp,
-        debugFileUrls
+        debugFileUrls,
+        fileBufferExists: !!fileBuffer,
+        fileBufferType: fileBuffer ? typeof fileBuffer : 'undefined'
       });
 
     } catch (uploadError) {

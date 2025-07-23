@@ -23,8 +23,6 @@ async function initDB() {
 
       try {
         const url = new URL(uri);
-        console.log(uri);
-        console.log('uri');
         // Get database name from pathname (remove leading slash)
         const pathDbName = url.pathname.substring(1);
         if (pathDbName && pathDbName !== '') {
@@ -36,17 +34,12 @@ async function initDB() {
         if (match && match[1]) {
           dbName = match[1];
         }
-        console.log(dbName);
-        console.log(dbName);
-        console.log(urlError)
-        console.log('urlError')
       }
 
       // Use database name from connection string, environment variable, or default
       const finalDbName = dbName || process.env.mongodb_db_name || 'arai-dev';
 
       mongodb = client.db(finalDbName);
-      console.log(`Connected to MongoDB database: ${finalDbName}`);
     } catch (err) {
       console.error('Error connecting to MongoDB:', err);
       throw err;

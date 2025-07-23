@@ -42,28 +42,6 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
       return Array.isArray(val);
     }
 
-    // Debug: Log fileBlob type and length
-    console.log('fileBlob typeof:', typeof fileBlob);
-    if (typeof fileBlob === 'string') {
-      console.log('fileBlob (string) length:', fileBlob.length);
-      // Log first 100 chars for inspection
-      console.log('fileBlob (string) first 100 chars:', fileBlob.slice(0, 100));
-    } else if (Buffer.isBuffer(fileBlob)) {
-      console.log('fileBlob (Buffer) length:', fileBlob.length);
-      // Log first 32 bytes as hex
-      console.log('fileBlob (Buffer) first 32 bytes:', fileBlob.slice(0, 32).toString('hex'));
-    } else if (isArray(fileBlob)) {
-      console.log('fileBlob (Array) length:', fileBlob.length);
-      // Log first 10 elements
-      if (fileBlob.length > 0) {
-        console.log('fileBlob (Array) first 10 elements:', fileBlob.slice(0, 10));
-      } else {
-        console.log('fileBlob (Array) is empty');
-      }
-    } else {
-      console.log('fileBlob (Unknown type):', fileBlob);
-    }
-
     // Handle binary CAF file directly (more efficient than base64)
     if (typeof fileBlob === 'string') {
       // If it's still base64 encoded (backward compatibility)
@@ -76,9 +54,6 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
       fileBuffer = Buffer.from(fileBlob as any);
     }
 
-    // Debug: Log fileBuffer length and first bytes
-    console.log('fileBuffer length:', fileBuffer.length);
-    console.log('fileBuffer first 32 bytes:', fileBuffer.slice(0, 32).toString('hex'));
 
     // Create temporary file paths with unique names to avoid conflicts in Lambda
     const timestamp = Date.now();
@@ -95,6 +70,7 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
       console.log('Input file size:', stat.size);
       // Log first 32 bytes of file
       const fileFirstBytes = fs.readFileSync(inputPath).slice(0, 32);
+      console.log('Input file first 32 bytes:', fileFirstBytes.toString('hex'));
 
       try {
         const ffprobeOutput = execFileSync(ffprobeStatic.path, [
@@ -107,6 +83,26 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
         console.log('ffprobe format_name:', probeJson.format?.format_name);
       } catch (probeErr) {
         console.error('ffprobe failed:', probeErr);
+      }
+
+      // Upload file to S3 for debugging (every time, not just on errors)
+      try {
+        const userId = ctx.state.user?.auth?.uid || 'anonymous';
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const requestId = shortUUID.generate();
+
+        // Upload original input file
+        const inputFileName = `debug-input-${timestamp}-${requestId}.caf`;
+        const inputFileUrl = await uploadFileForDebugging(
+          fileBuffer,
+          inputFileName,
+          userId,
+          'audio/x-caf'
+        );
+        console.log('Input file uploaded to S3 for debugging:', inputFileUrl);
+
+      } catch (uploadError) {
+        console.error('Failed to upload input file to S3:', uploadError);
       }
 
       // Verify FFmpeg binary exists
@@ -151,6 +147,26 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
         throw new Error('FFmpeg failed to create output file');
       }
 
+      // Upload output file to S3 for debugging (every time)
+      try {
+        const userId = ctx.state.user?.auth?.uid || 'anonymous';
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const requestId = shortUUID.generate();
+
+        const outputFileBuffer = fs.readFileSync(outputPath);
+        const outputFileName = `debug-output-${timestamp}-${requestId}.mp3`;
+        const outputFileUrl = await uploadFileForDebugging(
+          outputFileBuffer,
+          outputFileName,
+          userId,
+          'audio/mpeg'
+        );
+        console.log('Output file uploaded to S3 for debugging:', outputFileUrl);
+
+      } catch (uploadError) {
+        console.error('Failed to upload output file to S3:', uploadError);
+      }
+
       // Call OpenAI Whisper API for transcription using file path
       const transcriptionResult = await openai.audio.transcriptions.create({
         file: fs.createReadStream(outputPath),
@@ -161,11 +177,11 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
       // Create post with summary based on summarizationType
       let post = null;
       let summary = null;
-      console.log('transcriptionResult', JSON.stringify(transcriptionResult));
+
       if (body.summarizationType && body.summarizationType !== 'none') {
         try {
           const userId = ctx.state.user?.auth?.uid || 'default-user';
-          console.log('transcriptionResult', transcriptionResult);
+
           post = await createPostWithSummary({
             userId: userId,
             transcriptionResult: transcriptionResult.text,
@@ -214,7 +230,7 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
   } catch (err) {
     console.error('Error in trimAndTranscribe:', err);
 
-    // Upload files to S3 for debugging
+    // Upload files to S3 for debugging (error case - additional debugging)
     try {
       const userId = ctx.state.user?.auth?.uid || 'anonymous';
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -222,7 +238,7 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
 
       // Upload original input file if available
       if (fileBuffer) {
-        const inputFileName = `debug-input-${timestamp}-${errorType}.caf`;
+        const inputFileName = `error-input-${timestamp}-${errorType}.caf`;
         const inputFileUrl = await uploadFileForDebugging(
           fileBuffer,
           inputFileName,
@@ -246,7 +262,7 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
           decodedBuffer = Buffer.from(body.fileBlob as any);
         }
 
-        const inputFileName = `debug-input-${timestamp}-${errorType}.caf`;
+        const inputFileName = `error-input-${timestamp}-${errorType}.caf`;
         const inputFileUrl = await uploadFileForDebugging(
           decodedBuffer,
           inputFileName,
@@ -259,7 +275,7 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
       // Upload output file if it exists and has content
       if (outputPath && fs.existsSync(outputPath) && fs.statSync(outputPath).size > 0) {
         const outputFileBuffer = fs.readFileSync(outputPath);
-        const outputFileName = `debug-output-${timestamp}-${errorType}.mp3`;
+        const outputFileName = `error-output-${timestamp}-${errorType}.mp3`;
         const outputFileUrl = await uploadFileForDebugging(
           outputFileBuffer,
           outputFileName,
@@ -270,15 +286,13 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
       }
 
       // Log debug information
-      console.log('Debug files uploaded:', debugFileUrls);
+      console.log('Error debug files uploaded:', debugFileUrls);
       console.log('Error details:', {
         error: err instanceof Error ? err.message : String(err),
         errorType,
         userId,
         timestamp,
-        debugFileUrls,
-        fileBufferExists: !!fileBuffer,
-        fileBufferType: fileBuffer ? typeof fileBuffer : 'undefined'
+        debugFileUrls
       });
 
     } catch (uploadError) {

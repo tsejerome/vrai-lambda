@@ -31,26 +31,9 @@ const PromptHelper: IPromptHelper = {
   getPromptTemplate: async function (promptId: string): Promise<PromptTemplate | null> {
     try {
       await initDB();
-
-      console.log('Looking for template with promptId:', promptId);
-
       const template = await mongodb!.collection('PromptTemplate').findOne({
         templateId: promptId
       });
-
-      console.log('Template found:', template ? 'YES' : 'NO');
-      if (template) {
-        console.log('Template details:', {
-          templateId: template.templateId,
-          name: template.name,
-          userId: template.userId
-        });
-      } else {
-        // Let's see what templates are available
-        const allTemplates = await mongodb!.collection('PromptTemplate').find({}).toArray();
-        console.log('Available templates:', allTemplates.map(t => ({ templateId: t.templateId, name: t.name })));
-      }
-
       return template as PromptTemplate | null;
     } catch (error) {
       console.error('Error fetching prompt template:', error);
@@ -60,19 +43,9 @@ const PromptHelper: IPromptHelper = {
 
   getSummary: async function ({ promptId, userId, recordedContent, domain }) {
     try {
-      console.log('getSummary called with:', { promptId, userId, domain });
-
       const templateDoc = await this.getPromptTemplate(promptId);
-      console.log('Primary template lookup result:', templateDoc ? 'FOUND' : 'NOT FOUND');
 
-      const fallbackTemplate = templateDoc || await this.getPromptTemplate('simple-cleanup');
-      console.log('Fallback template lookup result:', fallbackTemplate ? 'FOUND' : 'NOT FOUND');
-
-      if (!fallbackTemplate) {
-        throw new Error(`Template not found: ${promptId} and fallback failed`);
-      }
-
-      const template = fallbackTemplate.template;
+      const template = templateDoc?.template as string;
       const msgContent = this.formatPromptMessage(template, recordedContent.trim(), domain);
 
       const input: OpenAI.Chat.ChatCompletionCreateParamsNonStreaming = {
@@ -94,9 +67,8 @@ const PromptHelper: IPromptHelper = {
         'n': 1
       };
 
-      console.log('Prompt content:', msgContent);
       const output = await openai.chat.completions.create(input);
-      return await this.createPrompt({ userId, recordedContent, input, output, template: fallbackTemplate });
+      return await this.createPrompt({ userId, recordedContent, input, output, template: templateDoc as PromptTemplate });
 
     } catch (err) {
       console.error('Error in getSummary:', err);

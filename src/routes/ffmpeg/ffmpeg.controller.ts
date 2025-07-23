@@ -161,7 +161,7 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
       // Create post with summary based on summarizationType
       let post = null;
       let summary = null;
-
+      console.log('transcriptionResult', JSON.stringify(transcriptionResult));
       if (body.summarizationType && body.summarizationType !== 'none') {
         try {
           const userId = ctx.state.user?.auth?.uid || 'default-user';

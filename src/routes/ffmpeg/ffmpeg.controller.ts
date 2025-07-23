@@ -95,7 +95,6 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
       console.log('Input file size:', stat.size);
       // Log first 32 bytes of file
       const fileFirstBytes = fs.readFileSync(inputPath).slice(0, 32);
-      console.log('Input file first 32 bytes:', fileFirstBytes.toString('hex'));
 
       try {
         const ffprobeOutput = execFileSync(ffprobeStatic.path, [
@@ -166,7 +165,7 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
       if (body.summarizationType && body.summarizationType !== 'none') {
         try {
           const userId = ctx.state.user?.auth?.uid || 'default-user';
-
+          console.log('transcriptionResult', transcriptionResult);
           post = await createPostWithSummary({
             userId: userId,
             transcriptionResult: transcriptionResult.text,

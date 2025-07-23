@@ -66,15 +66,15 @@ Transcribed audio: '''{{recordedContent}}'''`,
 export const seedPromptTemplates = async (): Promise<void> => {
   try {
     await initDB();
-    
+
     for (const template of DEFAULT_TEMPLATES) {
-      await mongodb!.collection('promptTemplates').updateOne(
+      await mongodb!.collection('PromptTemplate').updateOne(
         { templateId: template.templateId },
         { $setOnInsert: template },
         { upsert: true }
       );
     }
-    
+
     console.log('Prompt templates seeded successfully');
   } catch (error) {
     console.error('Error seeding prompt templates:', error);

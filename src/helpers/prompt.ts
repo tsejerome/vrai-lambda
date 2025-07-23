@@ -34,7 +34,7 @@ const PromptHelper: IPromptHelper = {
 
       console.log('Looking for template with promptId:', promptId);
 
-      const template = await mongodb!.collection('PromptTemplates').findOne({
+      const template = await mongodb!.collection('PromptTemplate').findOne({
         templateId: promptId
       });
 
@@ -47,7 +47,7 @@ const PromptHelper: IPromptHelper = {
         });
       } else {
         // Let's see what templates are available
-        const allTemplates = await mongodb!.collection('promptTemplates').find({}).toArray();
+        const allTemplates = await mongodb!.collection('PromptTemplate').find({}).toArray();
         console.log('Available templates:', allTemplates.map(t => ({ templateId: t.templateId, name: t.name })));
       }
 
@@ -118,7 +118,7 @@ const PromptHelper: IPromptHelper = {
       lastUpdated: new Date()
     };
 
-    const result = await mongodb!.collection('prompts').insertOne(promptData);
+    const result = await mongodb!.collection('Prompt').insertOne(promptData);
     return {
       ...promptData,
       id: result.insertedId,

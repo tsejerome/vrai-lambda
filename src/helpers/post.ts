@@ -41,7 +41,7 @@ export const createPostWithSummary = async (args: CreatePostArgs) => {
       isDeleted: false
     };
 
-    const result = await mongodb!.collection('posts').insertOne(postData);
+    const result = await mongodb!.collection('Post').insertOne(postData);
 
     return {
       ...postData,

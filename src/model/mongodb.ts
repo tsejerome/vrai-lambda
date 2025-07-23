@@ -36,6 +36,10 @@ async function initDB() {
         if (match && match[1]) {
           dbName = match[1];
         }
+        console.log(dbName);
+        console.log(dbName);
+        console.log(urlError)
+        console.log('urlError')
       }
 
       // Use database name from connection string, environment variable, or default

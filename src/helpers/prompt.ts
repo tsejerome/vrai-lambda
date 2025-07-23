@@ -32,9 +32,24 @@ const PromptHelper: IPromptHelper = {
     try {
       await initDB();
 
-      const template = await mongodb!.collection('promptTemplates').findOne({
+      console.log('Looking for template with promptId:', promptId);
+
+      const template = await mongodb!.collection('PromptTemplates').findOne({
         templateId: promptId
       });
+
+      console.log('Template found:', template ? 'YES' : 'NO');
+      if (template) {
+        console.log('Template details:', {
+          templateId: template.templateId,
+          name: template.name,
+          userId: template.userId
+        });
+      } else {
+        // Let's see what templates are available
+        const allTemplates = await mongodb!.collection('promptTemplates').find({}).toArray();
+        console.log('Available templates:', allTemplates.map(t => ({ templateId: t.templateId, name: t.name })));
+      }
 
       return template as PromptTemplate | null;
     } catch (error) {
@@ -45,9 +60,13 @@ const PromptHelper: IPromptHelper = {
 
   getSummary: async function ({ promptId, userId, recordedContent, domain }) {
     try {
+      console.log('getSummary called with:', { promptId, userId, domain });
+
       const templateDoc = await this.getPromptTemplate(promptId);
+      console.log('Primary template lookup result:', templateDoc ? 'FOUND' : 'NOT FOUND');
 
       const fallbackTemplate = templateDoc || await this.getPromptTemplate('simple-cleanup');
+      console.log('Fallback template lookup result:', fallbackTemplate ? 'FOUND' : 'NOT FOUND');
 
       if (!fallbackTemplate) {
         throw new Error(`Template not found: ${promptId} and fallback failed`);

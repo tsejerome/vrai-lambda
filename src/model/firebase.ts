@@ -71,10 +71,6 @@ const parseServiceAccountKey = (envVar: string): any => {
 
 const initFirebase = async () => {
   if (!firebase || !firestore) {
-    console.log('Initializing Firebase');
-    console.log('process.env.FIREBASE_SERVICE_ACCOUNT_KEY exists:', !!process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-    console.log('Type:', typeof process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-
     try {
       if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
         const serviceAccount = parseServiceAccountKey(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);

@@ -65,12 +65,9 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
     try {
       // Write the input file
       fs.writeFileSync(inputPath, fileBuffer as Uint8Array);
-      console.log('Wrote input file:', inputPath);
       const stat = fs.statSync(inputPath);
-      console.log('Input file size:', stat.size);
       // Log first 32 bytes of file
       const fileFirstBytes = fs.readFileSync(inputPath).slice(0, 32);
-      console.log('Input file first 32 bytes:', fileFirstBytes.toString('hex'));
 
       try {
         const ffprobeOutput = execFileSync(ffprobeStatic.path, [
@@ -115,6 +112,15 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
 
       // Trim the audio using FFmpeg and convert to MP3 (OpenAI prefers MP3)
       const duration = body.toTime - body.fromTime;
+
+      // Debug: Log time values
+      console.log('Time values:', {
+        fromTime: body.fromTime,
+        toTime: body.toTime,
+        duration: duration,
+        originalFileSize: fileBuffer.length
+      });
+
       const args = [
         '-i', inputPath,
         '-ss', body.fromTime.toString(),
@@ -127,6 +133,8 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
         '-y',           // Overwrite output file if exists
         outputPath
       ];
+
+      console.log('FFmpeg args:', args);
 
       await new Promise<void>((resolve, reject) => {
         execFile(ffmpegStatic.path, args, {

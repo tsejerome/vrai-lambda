@@ -42,7 +42,6 @@ const parseServiceAccountKey = (envVar: string): any => {
     return JSON.parse(envVar);
   } catch (directParseError) {
     const directError = directParseError as Error;
-    console.log('Direct JSON.parse failed:', directError.message);
 
     try {
       // Try Base64 decoding (in case it's base64 encoded)
@@ -50,7 +49,6 @@ const parseServiceAccountKey = (envVar: string): any => {
       return JSON.parse(decoded);
     } catch (base64Error) {
       const base64Err = base64Error as Error;
-      console.log('Base64 decode failed:', base64Err.message);
 
       try {
         // Try to fix common quote issues by adding quotes back
@@ -79,9 +77,7 @@ const initFirebase = async () => {
 
     try {
       if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
-        console.log('Parsing service account key...');
         const serviceAccount = parseServiceAccountKey(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
-        console.log('Successfully parsed service account');
         setupFirebase(serviceAccount);
       } else {
         // Fallback to local file

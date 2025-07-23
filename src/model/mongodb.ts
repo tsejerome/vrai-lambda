@@ -23,6 +23,8 @@ async function initDB() {
 
       try {
         const url = new URL(uri);
+        console.log(uri);
+        console.log('uri');
         // Get database name from pathname (remove leading slash)
         const pathDbName = url.pathname.substring(1);
         if (pathDbName && pathDbName !== '') {

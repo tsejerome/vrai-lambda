@@ -217,17 +217,55 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
       if (body.summarizationType && body.summarizationType !== 'none') {
         try {
           const userId = ctx.state.user?.auth?.uid || 'default-user';
+          console.log('Creating post with summary...');
+          console.log('Summarization type:', body.summarizationType);
+          console.log('User ID:', userId);
+          console.log('Transcription text length:', transcriptionResult.text.length);
+
+          // Map summarizationType to the correct prompt template
+          let promptId = body.summarizationType;
+          let domain = 'notion.so';
+
+          // Map the summarization types to actual prompt templates
+          if (body.summarizationType === 'summarize') {
+            promptId = 'simple-cleanup'; // Use simple-cleanup for general summarization
+            domain = 'notion.so';
+          } else if (body.summarizationType === 'whatsapp-cleanup') {
+            promptId = 'whatsapp-cleanup';
+            domain = 'whatsapp.com';
+          } else if (body.summarizationType === 'simple-cleanup') {
+            promptId = 'simple-cleanup';
+            domain = 'notion.so';
+          }
+
+          console.log('Mapped summarizationType to promptId:', {
+            originalType: body.summarizationType,
+            promptId,
+            domain
+          });
 
           post = await createPostWithSummary({
             userId: userId,
             transcriptionResult: transcriptionResult.text,
-            summarizationType: body.summarizationType,
-            domain: body.summarizationType === 'summarize' ? 'whatsapp.com' : 'notion.so'
+            summarizationType: promptId,
+            domain: domain
+          });
+
+          console.log('Post created successfully:', {
+            id: post.id,
+            title: post.title,
+            summarizedContent: post.summarizedContent,
+            finalContent: post.finalContent,
+            summary: post.summary
           });
 
           summary = post.summary;
         } catch (summaryError) {
           console.error('Error creating post with summary:', summaryError);
+          console.error('Summary error details:', {
+            message: summaryError instanceof Error ? summaryError.message : String(summaryError),
+            stack: summaryError instanceof Error ? summaryError.stack : undefined
+          });
         }
       }
 

@@ -27,6 +27,8 @@ const openai = new OpenAI({
   apiKey: process.env.openai_secret,
 });
 
+
+
 const trimAndTranscribe = async (ctx: Context, next: Next) => {
   let inputPath: string | null = null;
   let outputPath: string | null = null;
@@ -143,8 +145,10 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
         }, (error, stdout, stderr) => {
           if (error) {
             console.error('FFmpeg stderr:', stderr);
+            console.error('FFmpeg stdout:', stdout);
             reject(new Error(`FFmpeg execution failed: ${error.message}`));
           } else {
+
             resolve();
           }
         });
@@ -154,6 +158,8 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
       if (!fs.existsSync(outputPath) || fs.statSync(outputPath).size === 0) {
         throw new Error('FFmpeg failed to create output file');
       }
+
+
 
       // Upload output file to S3 for debugging (every time)
       try {
@@ -175,12 +181,34 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
         console.error('Failed to upload output file to S3:', uploadError);
       }
 
-      // Call OpenAI Whisper API for transcription using file path
-      const transcriptionResult = await openai.audio.transcriptions.create({
-        file: fs.createReadStream(outputPath),
-        model: 'whisper-1',
-        response_format: 'json'
-      });
+      // Call OpenAI Whisper API for transcription using file buffer
+      console.log('Starting OpenAI transcription...');
+      console.log('Output file size:', fs.statSync(outputPath).size, 'bytes');
+
+      let transcriptionResult;
+      try {
+        // Use the file path directly with createReadStream
+        transcriptionResult = await openai.audio.transcriptions.create({
+          file: fs.createReadStream(outputPath),
+          model: 'whisper-1',
+          response_format: 'json'
+        });
+        console.log('OpenAI transcription successful');
+        console.log('Transcription text:', `"${transcriptionResult.text}"`);
+        console.log('Transcription text length:', transcriptionResult.text?.length || 0);
+
+        if (!transcriptionResult.text || transcriptionResult.text.trim() === '') {
+          console.warn('Warning: Transcription result is empty or contains only whitespace');
+          console.log('This might indicate:');
+          console.log('- The selected audio segment is silent');
+          console.log('- The audio segment is too short');
+          console.log('- There is no speech in the selected time range');
+          console.log('- Audio quality is too poor for transcription');
+        }
+      } catch (transcriptionError) {
+        console.error('OpenAI transcription failed:', transcriptionError);
+        throw new Error(`Transcription failed: ${transcriptionError instanceof Error ? transcriptionError.message : String(transcriptionError)}`);
+      }
 
       // Create post with summary based on summarizationType
       let post = null;

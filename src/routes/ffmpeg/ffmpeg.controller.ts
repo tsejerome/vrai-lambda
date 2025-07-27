@@ -231,7 +231,7 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
         }
       }
 
-      ctx.body = {
+      const responseBody = {
         success: true,
         transcription: transcriptionResult.text,
         duration: duration,
@@ -248,6 +248,13 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
         }),
         ...(summary && { summary })
       };
+
+      console.log('Sending response to frontend:', JSON.stringify(responseBody, null, 2));
+      console.log('Response transcription field length:', responseBody.transcription?.length || 0);
+      console.log('Response transcription field type:', typeof responseBody.transcription);
+
+      // Set proper content type for JSON response with UTF-8 encoding
+      ctx.body = responseBody;
 
     } finally {
       // Clean up temporary files

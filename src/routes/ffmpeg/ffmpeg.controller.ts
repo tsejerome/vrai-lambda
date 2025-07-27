@@ -244,28 +244,32 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
             domain
           });
 
-          post = await createPostWithSummary({
-            userId: userId,
-            transcriptionResult: transcriptionResult.text,
-            summarizationType: promptId,
-            domain: domain
-          });
+          try {
+            post = await createPostWithSummary({
+              userId: userId,
+              transcriptionResult: transcriptionResult.text,
+              summarizationType: promptId,
+              domain: domain
+            });
 
-          console.log('Post created successfully:', {
-            id: post.id,
-            title: post.title,
-            summarizedContent: post.summarizedContent,
-            finalContent: post.finalContent,
-            summary: post.summary
-          });
+            console.log('Post created successfully:', {
+              id: post.id,
+              title: post.title,
+              summarizedContent: post.summarizedContent,
+              finalContent: post.finalContent,
+              summary: post.summary
+            });
 
-          summary = post.summary;
-        } catch (summaryError) {
-          console.error('Error creating post with summary:', summaryError);
-          console.error('Summary error details:', {
-            message: summaryError instanceof Error ? summaryError.message : String(summaryError),
-            stack: summaryError instanceof Error ? summaryError.stack : undefined
-          });
+            summary = post.summary;
+          } catch (summaryError) {
+            console.error('Error creating post with summary:', summaryError);
+            console.error('Summary error details:', {
+              message: summaryError instanceof Error ? summaryError.message : String(summaryError),
+              stack: summaryError instanceof Error ? summaryError.stack : undefined
+            });
+          }
+        } catch (error) {
+          console.error('Error in summarization block:', error);
         }
       }
 

@@ -43,11 +43,7 @@ const PromptHelper: IPromptHelper = {
 
   getSummary: async function ({ promptId, userId, recordedContent, domain }) {
     try {
-      console.log('getSummary called with:', { promptId, userId, domain, recordedContentLength: recordedContent.length });
-
       const templateDoc = await this.getPromptTemplate(promptId);
-      console.log('Template doc found:', !!templateDoc);
-      console.log('Template doc template:', templateDoc?.template);
 
       if (!templateDoc || !templateDoc.template) {
         console.error('No template found for promptId:', promptId);
@@ -56,7 +52,6 @@ const PromptHelper: IPromptHelper = {
 
       const template = templateDoc.template as string;
       const msgContent = this.formatPromptMessage(template, recordedContent.trim(), domain);
-      console.log('Formatted message content:', msgContent);
 
       const input: OpenAI.Chat.ChatCompletionCreateParamsNonStreaming = {
         'model': 'gpt-4o',
@@ -74,15 +69,11 @@ const PromptHelper: IPromptHelper = {
         'temperature': 0.5,
         'frequency_penalty': 1,
         'max_tokens': 4096,
-        'n': 1
+        'n': 1,
+        'seed': Math.floor(Math.random() * 1000000) // Add random seed to prevent caching
       };
 
-      console.log('Calling OpenAI with input:', JSON.stringify(input, null, 2));
       const output = await openai.chat.completions.create(input);
-      console.log('OpenAI response received:', {
-        choices: output.choices.length,
-        firstChoiceContent: output.choices[0]?.message?.content
-      });
 
       return await this.createPrompt({ userId, recordedContent, input, output, template: templateDoc as PromptTemplate });
 

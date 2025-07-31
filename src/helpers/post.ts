@@ -20,14 +20,14 @@ export const createPostWithSummary = async (args: CreatePostArgs) => {
       domain: args.summarizationType === 'summarizev2' ? 'whatsapp.com' : args.domain
     });
 
-    const title = await PromptHelper.getSummary({
-      userId: args.userId,
-      promptId: 'title',
-      recordedContent: args.transcriptionResult
-    });
+    // const title = await PromptHelper.getSummary({
+    //   userId: args.userId,
+    //   promptId: 'title',
+    //   recordedContent: args.transcriptionResult
+    // });
 
     const postData = {
-      title: title.cleanResponse,
+      title: `Random Title ${new Date().toUTCString()}`,
       userId: args.userId,
       audioUrl: args.audioUrl || null,
       transcriptionResult: args.transcriptionResult,

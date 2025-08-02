@@ -79,7 +79,6 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
           inputPath
         ], { encoding: 'utf8' });
         const probeJson = JSON.parse(ffprobeOutput);
-        console.log('ffprobe format_name:', probeJson.format?.format_name);
       } catch (probeErr) {
         console.error('ffprobe failed:', probeErr);
       }
@@ -120,7 +119,6 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
         fromTime: body.fromTime,
         toTime: body.toTime,
         duration: duration,
-        originalFileSize: fileBuffer.length
       });
 
       const args = [
@@ -135,8 +133,6 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
         '-y',           // Overwrite output file if exists
         outputPath
       ];
-
-      console.log('FFmpeg args:', args);
 
       await new Promise<void>((resolve, reject) => {
         execFile(ffmpegStatic.path, args, {
@@ -176,14 +172,11 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
           'audio/mpeg'
         );
         console.log('Output file uploaded to S3 for debugging:', outputFileUrl);
-
       } catch (uploadError) {
         console.error('Failed to upload output file to S3:', uploadError);
       }
 
       // Call OpenAI Whisper API for transcription using file buffer
-      console.log('Starting OpenAI transcription...');
-      console.log('Output file size:', fs.statSync(outputPath).size, 'bytes');
 
       let transcriptionResult;
       try {
@@ -193,18 +186,7 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
           model: 'whisper-1',
           response_format: 'json'
         });
-        console.log('OpenAI transcription successful');
-        console.log('Transcription text:', `"${transcriptionResult.text}"`);
-        console.log('Transcription text length:', transcriptionResult.text?.length || 0);
 
-        if (!transcriptionResult.text || transcriptionResult.text.trim() === '') {
-          console.warn('Warning: Transcription result is empty or contains only whitespace');
-          console.log('This might indicate:');
-          console.log('- The selected audio segment is silent');
-          console.log('- The audio segment is too short');
-          console.log('- There is no speech in the selected time range');
-          console.log('- Audio quality is too poor for transcription');
-        }
       } catch (transcriptionError) {
         console.error('OpenAI transcription failed:', transcriptionError);
         throw new Error(`Transcription failed: ${transcriptionError instanceof Error ? transcriptionError.message : String(transcriptionError)}`);
@@ -217,10 +199,6 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
       if (body.summarizationType && body.summarizationType !== 'none') {
         try {
           const userId = ctx.state.user?.auth?.uid || 'default-user';
-          console.log('Creating post with summary...');
-          console.log('Summarization type:', body.summarizationType);
-          console.log('User ID:', userId);
-          console.log('Transcription text length:', transcriptionResult.text.length);
 
           // Map summarizationType to the correct prompt template
           let promptId = body.summarizationType;
@@ -238,11 +216,7 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
             domain = 'notion.so';
           }
 
-          console.log('Mapped summarizationType to promptId:', {
-            originalType: body.summarizationType,
-            promptId,
-            domain
-          });
+
 
           try {
             post = await createPostWithSummary({
@@ -292,8 +266,6 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
       };
 
       console.log('Sending response to frontend:', JSON.stringify(responseBody, null, 2));
-      console.log('Response transcription field length:', responseBody.transcription?.length || 0);
-      console.log('Response transcription field type:', typeof responseBody.transcription);
 
       // Set proper content type for JSON response with UTF-8 encoding
       ctx.body = responseBody;

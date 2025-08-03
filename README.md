@@ -4,6 +4,34 @@ VoiceRecorder AI Lambda Server - FFmpeg processing service for audio and video p
 
 A serverless backend with KOA, TypeScript, Serverless Framework and Firebase for the Vrai (Voice Recorder AI) project.
 
+## 🚀 Modal.com Migration Available
+
+This repository now includes a **Modal.com migration** that maintains the same TypeScript functionality with improved performance and scalability. See:
+
+- **[README-MODAL.md](./README-MODAL.md)** - Quick start guide for Modal.com version
+- **[MODAL_MIGRATION_GUIDE.md](./MODAL_MIGRATION_GUIDE.md)** - Complete step-by-step migration instructions
+
+### Key Benefits of Modal.com Migration
+
+- ✅ **TypeScript Preserved**: Same language, same functionality
+- ✅ **Better Performance**: Faster cold starts and automatic scaling
+- ✅ **Resource Control**: Exact 1 CPU + 1GB RAM configuration
+- ✅ **Simplified Deployment**: No complex serverless framework setup
+- ✅ **Cost Optimization**: Pay only for actual compute time
+
+### Quick Migration
+
+```bash
+# Install Modal CLI
+pip install modal
+modal setup
+
+# Deploy to Modal
+npm run modal:deploy
+```
+
+For complete migration instructions, see [MODAL_MIGRATION_GUIDE.md](./MODAL_MIGRATION_GUIDE.md).
+
 ## Set up / Install1. `npm i --save`
 
 ## Environment Variables Setup

@@ -1,0 +1,21 @@
+{
+  "name": "vrai-modal-handlers",
+  "version": "1.0.0",
+  "description": "Node.js handlers for Modal.com deployment",
+  "main": "health.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.637.0",
+    "@aws-sdk/lib-storage": "^3.637.0",
+    "firebase-admin": "^9.0.0",
+    "openai": "^5.10.1",
+    "uuid": "^8.3.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "",
+  "license": "ISC"
+}

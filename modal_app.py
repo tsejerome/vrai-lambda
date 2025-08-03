@@ -11,10 +11,10 @@ image = (
     .apt_install([
         "curl",
         "ffmpeg",
-        "ffprobe",
         "nodejs",
         "npm"
     ])
+    .pip_install("fastapi[standard]")
     .run_commands([
         "npm install -g typescript ts-node",
         "node --version",
@@ -22,10 +22,10 @@ image = (
         "ffmpeg -version",
         "ffprobe -version"
     ])
-    .copy_local_dir("./handlers", "/app/handlers")
-    .copy_local_file("./package.json", "/app/package.json")
-    .copy_local_file("./tsconfig.json", "/app/tsconfig.json")
     .workdir("/app")
+    .add_local_dir("./handlers", "/app/handlers", copy=True)
+    .add_local_file("./package.json", "/app/package.json", copy=True)
+    .add_local_file("./tsconfig.json", "/app/tsconfig.json", copy=True)
     .run_commands([
         "npm install --production"
     ])
@@ -36,14 +36,14 @@ image = (
     cpu=1.0,
     memory=1024,
     timeout=60,
-    secrets=[
-        modal.Secret.from_name("firebase-config"),
-        modal.Secret.from_name("openai-config"),
-        modal.Secret.from_name("aws-config"),
-        modal.Secret.from_name("database-config")
-    ]
+    # secrets=[
+    #     modal.Secret.from_name("firebase-config"),
+    #     modal.Secret.from_name("openai-config"),
+    #     modal.Secret.from_name("aws-config"),
+    #     modal.Secret.from_name("database-config")
+    # ]
 )
-@modal.web_endpoint(method="GET")
+@modal.fastapi_endpoint(method="GET")
 def health():
     """Health check endpoint for the vrai-ffmpeg service"""
     try:
@@ -70,14 +70,14 @@ def health():
     cpu=1.0,
     memory=1024,
     timeout=900,  # 15 minutes for audio processing
-    secrets=[
-        modal.Secret.from_name("firebase-config"),
-        modal.Secret.from_name("openai-config"),
-        modal.Secret.from_name("aws-config"),
-        modal.Secret.from_name("database-config")
-    ]
+    # secrets=[
+    #     modal.Secret.from_name("firebase-config"),
+    #     modal.Secret.from_name("openai-config"),
+    #     modal.Secret.from_name("aws-config"),
+    #     modal.Secret.from_name("database-config")
+    # ]
 )
-@modal.web_endpoint(method="POST")
+@modal.fastapi_endpoint(method="POST")
 def trim_and_transcribe():
     """Main endpoint for trimming audio and transcribing with OpenAI Whisper"""
     try:

@@ -1,0 +1,32 @@
+[app]
+name = "vrai-ffmpeg-processor"
+description = "VoiceRecorder AI FFmpeg processing service on Modal.com"
+
+[build]
+dockerfile = "Dockerfile"
+
+[secrets]
+firebase-config = [
+    "FIREBASE_SERVICE_ACCOUNT_KEY"
+]
+openai-config = [
+    "OPENAI_SECRET",
+    "openai_secret"
+]
+aws-config = [
+    "AWS_ACCESS_KEY_ID",
+    "AWS_ACCESS_PW",
+    "S3_BUCKET_NAME"
+]
+database-config = [
+    "DATABASE_URL"
+]
+
+[resources]
+cpu = 1.0
+memory = 1024
+timeout = 900
+
+[endpoints]
+health = "/health"
+process = "/trim-and-transcribe"

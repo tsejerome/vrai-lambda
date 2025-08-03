@@ -6,20 +6,19 @@ description = "VoiceRecorder AI FFmpeg processing service on Modal.com"
 dockerfile = "Dockerfile"
 
 [secrets]
-firebase-config = [
-    "FIREBASE_SERVICE_ACCOUNT_KEY"
-]
-openai-config = [
+custom-secret = [
+    "FIREBASE_SERVICE_ACCOUNT_KEY",
     "OPENAI_SECRET",
-    "openai_secret"
-]
-aws-config = [
+    "openai_secret",
     "AWS_ACCESS_KEY_ID",
     "AWS_ACCESS_PW",
-    "S3_BUCKET_NAME"
-]
-database-config = [
-    "DATABASE_URL"
+    "S3_BUCKET_NAME",
+    "DATABASE_URL",
+    "NEXT_PUBLIC_CLIENT_FIREBASE_CONFIG",
+    "aws_access_key_id",
+    "aws_access_pw",
+    "s3_bucket_name",
+    "sieve_api_key"
 ]
 
 [resources]

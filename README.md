@@ -2,7 +2,49 @@
 
 VoiceRecorder AI Lambda Server - FFmpeg processing service for audio and video processing
 
-A serverless backend with KOA, TypeScript, Serverless Framework and Firebase for the Vrai (Voice Recorder AI) project.
+A serverless backend with KOA, TypeScript, and Firebase for the Vrai (Voice Recorder AI) project.
+
+## 🚀 Deployment Options
+
+This application can be deployed to either **AWS Lambda** (using Serverless Framework) or **Fly.io** (containerized deployment).
+
+### Fly.io Deployment (Recommended)
+
+For Fly.io deployment, see the comprehensive migration guide: [FLY_DEPLOYMENT.md](./FLY_DEPLOYMENT.md)
+
+**Quick Start:**
+```bash
+# Install Fly CLI
+brew install flyctl  # macOS
+# or visit https://fly.io/docs/hands-on/install-flyctl/
+
+# Login and deploy
+fly auth login
+./scripts/migrate-to-fly.sh
+```
+
+### AWS Lambda Deployment (Legacy)
+
+For AWS Lambda deployment using Serverless Framework, see the legacy setup below.
+
+## 🆕 Migration Benefits
+
+Migrating from AWS Lambda to Fly.io provides several advantages:
+
+- **Cost Efficiency**: Pay only for actual compute time, scales to zero when not in use
+- **Simplified Deployment**: No complex Lambda layers or cold start issues
+- **Better Performance**: No cold starts, consistent response times
+- **Easier Debugging**: Direct access to logs and container environment
+- **Global Edge Network**: Automatic global distribution
+- **Simplified FFmpeg Setup**: System-installed binaries instead of Lambda layers
+
+## 📋 Migration Status
+
+- ✅ Application code migrated to Fly.io
+- ✅ FFmpeg configuration updated for containerized deployment
+- ✅ Health checks and monitoring configured
+- ✅ Environment variable management set up
+- ✅ Deployment scripts and documentation created
 
 ## Set up / Install1. `npm i --save`
 

@@ -5,16 +5,12 @@
   "main": "dist/app.js",
   "scripts": {
     "dev": "export NODE_ENV=dev && nodemon app.ts",
-    "dev:offline": "export NODE_ENV=dev && serverless offline",
-    "dev:offline-debug": "export NODE_ENV=dev && node --inspect=0.0.0.0:9229 ./node_modules/serverless/bin/serverless offline --verbose",
-    "ncu": "ncu",
-    "build-pro": "tsc -p tsconfig.production.json",
+    "start": "node dist/app.js",
     "build": "tsc",
-    "predeploy": "npm ci --production && rsync -avz node_modules dist/",
     "test": "jest --passWithNoTests",
-    "staging": "serverless deploy",
-    "deploy": "serverless deploy --stage production",
-    "debug": "export SLS_DEBUG=* && node --inspect ./node_modules/serverless/bin/serverless offline"
+    "fly:deploy": "fly deploy",
+    "fly:logs": "fly logs",
+    "fly:status": "fly status"
   },
   "jest": {
     "preset": "ts-jest",
@@ -53,7 +49,6 @@
     "mongodb": "^3.6.0",
     "nodemon": "^2.0.4",
     "openai": "^5.10.1",
-    "serverless-http": "3.2.0",
     "short-uuid": "^4.2.2",
     "sib-api-v3-sdk": "^8.2.1",
     "ts-node": "^10.9.2",
@@ -77,16 +72,6 @@
     "esbuild": "0.20.2",
     "jest": "^26.6.3",
     "nodemon": "^2.0.4",
-    "npm-check-updates": "^4.1.2",
-    "serverless": "^3.38.0",
-    "serverless-dotenv-plugin": "^6.0.0",
-    "serverless-esbuild": "^1.54.3",
-    "serverless-offline": "^13.8.0",
-    "serverless-offline-sns": "^0.78.0",
-    "serverless-plugin-include-dependencies": "^4.1.0",
-    "serverless-plugin-typescript": "2.1.5",
-    "serverless-plugin-warmup": "8.3.0",
-    "serverless-plugin-warmup-ts-bridge": "^0.1.3",
     "ts-jest": "^26.5.6",
     "typescript": "^4.9.5"
   }

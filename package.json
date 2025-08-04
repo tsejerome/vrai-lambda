@@ -10,7 +10,8 @@
     "test": "jest --passWithNoTests",
     "fly:deploy": "fly deploy",
     "fly:logs": "fly logs",
-    "fly:status": "fly status"
+    "fly:status": "fly status",
+    "fly:watch": "fly deploy --watch"
   },
   "jest": {
     "preset": "ts-jest",

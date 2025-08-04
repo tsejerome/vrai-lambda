@@ -29,7 +29,7 @@ jobs:
           npm ci
           npm uninstall @types/minimatch 2>/dev/null || true
           npx tsc --version
-          npx tsc
+          npx tsc --project tsconfig.json
           ls -la dist/
           test -f dist/app.js
       

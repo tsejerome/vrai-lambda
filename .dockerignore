@@ -28,8 +28,8 @@ build
 patches
 venv
 jest.config.js
-tsconfig.json
-tsconfig.production.json
-types
+# tsconfig.json  # Commented out - needed for build
+# tsconfig.production.json  # Commented out - needed for build
+# types  # Commented out - needed for build (contains ffmpeg.d.ts)
 curl_examples.md
 Makefile 

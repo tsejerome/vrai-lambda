@@ -22,11 +22,21 @@ RUN npm ci && npm cache clean --force
 # Clean up any deprecated type packages that might cause issues
 RUN npm uninstall @types/minimatch 2>/dev/null || true
 
+# Verify TypeScript is available and show environment info
+RUN npx tsc --version && \
+    echo "Node version: $(node --version)" && \
+    echo "NPM version: $(npm --version)" && \
+    echo "Working directory: $(pwd)" && \
+    ls -la
+
 # Copy source code
 COPY . .
 
-# Build the application
-RUN npm run build
+# Build the application with explicit TypeScript compilation
+RUN npx tsc
+
+# Verify build output exists
+RUN ls -la dist/ && test -f dist/app.js
 
 # Remove dev dependencies to keep production image lean
 RUN npm prune --production

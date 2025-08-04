@@ -28,7 +28,10 @@ jobs:
           rm -rf dist/
           npm ci
           npm uninstall @types/minimatch 2>/dev/null || true
-          npm run build
+          npx tsc --version
+          npx tsc
+          ls -la dist/
+          test -f dist/app.js
       
       - name: Setup Fly.io
         uses: superfly/flyctl-actions/setup-flyctl@master

@@ -112,12 +112,18 @@ fly secrets list
 - Updated paths to use system binaries (`ffmpeg` and `ffprobe`)
 - FFmpeg is installed via Alpine package manager in Docker
 
-### 3. Environment Configuration
+### 3. Storage Architecture
+- **Temporary Storage Only**: Uses `/tmp` for file processing
+- **S3 for Debugging**: Debug files uploaded to S3
+- **Automatic Cleanup**: Files cleaned up after each request
+- **No Persistent Storage**: Optimized for stateless processing
+
+### 4. Environment Configuration
 - Removed serverless-specific environment handling
 - Added Fly.io environment variable support
 - Updated health check endpoints
 
-### 4. Build and Deployment
+### 5. Build and Deployment
 - Added Dockerfile for containerization
 - Created `fly.toml` configuration
 - Updated package.json scripts for Fly.io deployment

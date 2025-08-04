@@ -39,10 +39,8 @@ primary_region = "iad"
   cpus = 1
   memory_mb = 1024
 
-# Mounts are commented out to avoid extension creation issues
-# [mounts]
-#   source = "vrai_data"
-#   destination = "/data"
+# No persistent storage needed - using /tmp for temporary files
+# Temporary files are automatically cleaned up after each request
 
 [processes]
   app = "npm start" 

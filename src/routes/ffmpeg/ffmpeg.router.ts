@@ -4,6 +4,7 @@ import { Expose } from 'class-transformer';
 import { IsDefined, IsOptional, IsNumber, IsString } from 'class-validator';
 import { Context } from 'koa';
 import { coreValidation } from '../../util/validation';
+import multer from '@koa/multer';
 
 export class TrimAndTranscribeRequestBody {
   @IsDefined()
@@ -43,6 +44,15 @@ const validateTrimAndTranscribe = async (ctx: Context, next: any) => {
   }
 }
 
+// Configure multer for multipart uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 50 * 1024 * 1024, // 50MB limit
+    files: 1 // Only allow 1 file
+  }
+});
+
 let ffmpegRouter = new koaRouter()
 
 // Health check route for debugging
@@ -60,6 +70,6 @@ ffmpegRouter.get('/health', async (ctx) => {
 ffmpegRouter.post('/trim-and-transcribe', routeAuth.userRoute, validateTrimAndTranscribe, ffmpegController.trimAndTranscribe);
 
 // New multipart endpoint for memory-efficient uploads
-ffmpegRouter.post('/trim-and-transcribe-multipart', routeAuth.userRoute, upload.single('audio'), ffmpegController.trimAndTranscribeMultipart);
+ffmpegRouter.post('/trim-and-transcribe-multipart', routeAuth.userRoute, upload.single('audio') as any, ffmpegController.trimAndTranscribeMultipart);
 
 export { ffmpegRouter };

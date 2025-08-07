@@ -4,7 +4,6 @@ import { Expose } from 'class-transformer';
 import { IsDefined, IsOptional, IsNumber, IsString } from 'class-validator';
 import { Context } from 'koa';
 import { coreValidation } from '../../util/validation';
-import multer from '@koa/multer';
 
 export class TrimAndTranscribeRequestBody {
   @IsDefined()

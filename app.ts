@@ -6,7 +6,6 @@ import cors from 'koa-cors';
 import helmet from 'koa-helmet';
 import error from 'koa-json-error'
 import dotenv from 'dotenv';
-import multer from '@koa/multer';
 dotenv.config();
 
 process.env.repo_name = 'vrai-lambda'

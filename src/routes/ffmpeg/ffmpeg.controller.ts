@@ -8,15 +8,11 @@ import OpenAI from 'openai';
 import { createPostWithSummary } from '../../helpers/post';
 import { uploadFileForDebugging } from '../../util/s3';
 
-// production / staging
+// For Fly.io deployment, use system-installed FFmpeg
 const ffprobeStatic = {
-  path: process.env.IS_OFFLINE
-    ? (process.env.FFPROBE_PATH || path.resolve(process.cwd(), 'ffmpeg', 'bin', 'ffprobe'))
-    : '/opt/bin/ffprobe'
+  path: process.env.FFPROBE_PATH || 'ffprobe'
 }
-const ffmpegPath = process.env.IS_OFFLINE
-  ? (process.env.FFMPEG_PATH || path.resolve(process.cwd(), 'ffmpeg', 'bin', 'ffmpeg'))
-  : '/opt/bin/ffmpeg'
+const ffmpegPath = process.env.FFMPEG_PATH || 'ffmpeg'
 
 // don't remove below
 const ffmpegStatic = {

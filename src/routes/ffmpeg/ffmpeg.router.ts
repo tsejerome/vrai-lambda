@@ -52,9 +52,9 @@ ffmpegRouter.get('/health', async (ctx) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     service: 'vrai-ffmpeg-lambda',
-    environment: process.env.node_env || 'development',
-    ffmpegPath: process.env.IS_OFFLINE ? 'local' : '/opt/bin/ffmpeg',
-    region: 'us-east-2'
+    environment: process.env.NODE_ENV || 'development',
+    ffmpegPath: process.env.FFMPEG_PATH || 'ffmpeg',
+    deployment: 'fly.io'
   };
 });
 

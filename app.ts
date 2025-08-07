@@ -5,7 +5,6 @@ import bodyParser from 'koa-bodyparser';
 import cors from 'koa-cors';
 import helmet from 'koa-helmet';
 import error from 'koa-json-error'
-import serverless from 'serverless-http'
 import dotenv from 'dotenv';
 import multer from '@koa/multer';
 dotenv.config();
@@ -73,13 +72,28 @@ app
   .use(api.allowedMethods())
   ;
 
-module.exports.server = serverless(app, {
-  request: function (req: any, ...context: any) {
-    context.callbackWaitsForEmptyEventLoop = false;
-  }
-});
+// For Fly.io deployment, we need to start the server directly
+const PORT = parseInt(process.env.PORT || '8080', 10);
+
+if (require.main === module) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`📊 Health check available at http://localhost:${PORT}/`);
+    console.log(`🔧 API health check at http://localhost:${PORT}/apis/health`);
+  });
+}
 
 process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
   closeDB();
-  // app.close();
-})
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  closeDB();
+  process.exit(0);
+});
+
+// Export for testing purposes
+export default app;

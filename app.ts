@@ -7,6 +7,7 @@ import helmet from 'koa-helmet';
 import error from 'koa-json-error'
 import serverless from 'serverless-http'
 import dotenv from 'dotenv';
+import multer from '@koa/multer';
 dotenv.config();
 
 process.env.repo_name = 'vrai-lambda'
@@ -39,7 +40,8 @@ const app = new Koa()
 app
   .use(cors(options))
   .use(bodyParser({
-    jsonLimit: '20mb', // Increase JSON payload size limit to 10 MB
+    jsonLimit: '50mb', // Increase JSON payload size limit for large audio files
+    formLimit: '50mb', // Increase form data limit for multipart uploads
   }))
   .use(helmet())
   .use(error({

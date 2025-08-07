@@ -4,6 +4,7 @@ import { Expose } from 'class-transformer';
 import { IsDefined, IsOptional, IsNumber, IsString } from 'class-validator';
 import { Context } from 'koa';
 import { coreValidation } from '../../util/validation';
+import multer from '@koa/multer';
 
 export class TrimAndTranscribeRequestBody {
   @IsDefined()
@@ -58,5 +59,8 @@ ffmpegRouter.get('/health', async (ctx) => {
 });
 
 ffmpegRouter.post('/trim-and-transcribe', routeAuth.userRoute, validateTrimAndTranscribe, ffmpegController.trimAndTranscribe);
+
+// New multipart endpoint for memory-efficient uploads
+ffmpegRouter.post('/trim-and-transcribe-multipart', routeAuth.userRoute, upload.single('audio'), ffmpegController.trimAndTranscribeMultipart);
 
 export { ffmpegRouter };

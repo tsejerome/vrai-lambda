@@ -54,3 +54,50 @@ function closeDB() {
 }
 
 export { initDB, closeDB, mongodb };
+
+// Function to update user's remaining minutes
+export const updateUserRemainingMinutes = async (uid: string, deduction: number = 1) => {
+  try {
+    if (!mongodb) {
+      await initDB();
+    }
+
+    const usersCollection = mongodb?.collection('users');
+    if (!usersCollection) {
+      console.log('Users collection not found');
+      return false;
+    }
+
+    // Get current user data
+    const user = await usersCollection.findOne({ uid });
+    if (!user) {
+      console.log(`User with uid ${uid} not found`);
+      return false;
+    }
+
+    const currentRemainingMinutes = user.remainingMinutes || 0;
+    const newRemainingMinutes = Math.max(0, currentRemainingMinutes - deduction);
+
+    // Update the user's remaining minutes
+    const result = await usersCollection.updateOne(
+      { uid },
+      {
+        $set: {
+          remainingMinutes: newRemainingMinutes,
+          lastUpdated: new Date()
+        }
+      }
+    );
+
+    if (result.modifiedCount > 0) {
+      console.log(`Updated user ${uid} remaining minutes: ${currentRemainingMinutes} -> ${newRemainingMinutes}`);
+      return true;
+    } else {
+      console.log(`No changes made to user ${uid}`);
+      return false;
+    }
+  } catch (error) {
+    console.error('Error updating user remaining minutes:', error);
+    return false;
+  }
+};

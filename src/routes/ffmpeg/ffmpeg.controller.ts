@@ -7,6 +7,7 @@ import { TrimAndTranscribeRequestBody } from './ffmpeg.router';
 import OpenAI from 'openai';
 import { createPostWithSummary } from '../../helpers/post';
 import { uploadFileForDebugging } from '../../util/s3';
+import { updateUserRemainingMinutes } from '../../model/mongodb';
 
 // For Fly.io deployment, use system-installed FFmpeg
 const ffprobeStatic = {
@@ -581,6 +582,20 @@ const trimAndTranscribeMultipart = async (ctx: Context, next: Next) => {
 
       console.log('✅ [Multipart] Sending response to frontend');
       ctx.body = responseBody;
+
+      // Update user's remaining minutes (-1)
+      try {
+        const userId = ctx.state.user?.auth?.uid;
+        if (userId) {
+          await updateUserRemainingMinutes(userId, 1);
+          console.log('✅ [Multipart] User remaining minutes updated');
+        } else {
+          console.log('⚠️ [Multipart] No user ID found, skipping remaining minutes update');
+        }
+      } catch (updateError) {
+        console.error('❌ [Multipart] Failed to update user remaining minutes:', updateError);
+        // Don't fail the request if this update fails
+      }
 
     } finally {
       // Clean up temporary files

@@ -592,11 +592,11 @@ const trimAndTranscribeMultipart = async (ctx: Context, next: Next) => {
       };
 
       console.log('✅ [Multipart] Sending response to frontend');
-      ctx.body = responseBody;
 
       // Update user's remaining minutes (-1)
       try {
         const userId = ctx.state.user?.auth?.uid;
+        console.log('✅ [Multipart] User ID:', userId);
         if (userId) {
           await updateUserRemainingMinutes(userId, 1);
           console.log('✅ [Multipart] User remaining minutes updated');
@@ -607,6 +607,7 @@ const trimAndTranscribeMultipart = async (ctx: Context, next: Next) => {
         console.error('❌ [Multipart] Failed to update user remaining minutes:', updateError);
         // Don't fail the request if this update fails
       }
+      ctx.body = responseBody;
 
     } finally {
       // Clean up temporary files

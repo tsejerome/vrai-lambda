@@ -367,7 +367,18 @@ const trimAndTranscribe = async (ctx: Context, next: Next) => {
 
     ctx.throw(500, errorResponse);
   }
-
+  try {
+    const userId = ctx.state.user?.auth?.uid;
+    if (userId) {
+      await updateUserRemainingMinutes(userId, 1);
+      console.log('✅ [Multipart] User remaining minutes updated');
+    } else {
+      console.log('⚠️ [Multipart] No user ID found, skipping remaining minutes update');
+    }
+  } catch (updateError) {
+    console.error('❌ [Multipart] Failed to update user remaining minutes:', updateError);
+    // Don't fail the request if this update fails
+  }
   await next();
 };
 
